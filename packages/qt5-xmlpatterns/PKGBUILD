@@ -26,7 +26,7 @@ prepare() {
 
 build() {
   cd build
-  ${_prefix}/${_target}/lib/qt/bin/qmake ../${_pkgfqn}
+  ${_prefix}/bin/${_target}-qmake ../${_pkgfqn}
   make
 }
 
@@ -36,7 +36,7 @@ package() {
 
   find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
   # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
-  find "$pkgdir/${_prefix}/${_target}/lib" -type f -name '*.prl' \
+  find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -type f -name '*.prl' \
     -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
 
   #install -d "$pkgdir"/usr/share/licenses

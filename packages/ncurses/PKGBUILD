@@ -12,6 +12,7 @@ url='http://invisible-island.net/ncurses/ncurses.html'
 license=(MIT)
 options=(staticlibs !strip !buildflags)
 depends=("${_target}-gcc")
+makedepends=("${_target}-configure")
 source=(https://ftp.gnu.org/pub/gnu/ncurses/ncurses-$pkgver.tar.gz{,.sig})
 md5sums=('98c889aaf8d23910d2b92d65be2e737a'
          'SKIP')
@@ -21,7 +22,7 @@ build() {
   cd ${pkgname##${_target}-}-${_pkgver}
 
   ${_target}-configure --with-pkg-config-libdir="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
-    --with-shared --with-normal --without-debug --without-ada \
+    --with-shared --with-normal --without-debug --without-ada --disable-stripping\
     --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared --includedir="${_prefix}/${_target}/sysroot/usr/include" \
     --with-termlib=tinfo --with-ticlib=tic .
   make
@@ -32,7 +33,7 @@ package() {
   make DESTDIR="$pkgdir" install
   #rm "${pkgdir}${_prefix}/${_target}/lib/terminfo"
   find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
-
+  ${_target}-strip "$pkgdir/${_prefix}/${_target}/sysroot/bin/${_target}-"*
   # fool packages looking to link to non-wide-character ncurses libraries
   for lib in ncurses ncurses++ form panel menu; do
     echo "INPUT(-l${lib}w)" > "${pkgdir}/${_prefix}/${_target}/sysroot/lib/lib${lib}.so"

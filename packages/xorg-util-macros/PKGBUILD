@@ -11,6 +11,7 @@ license=('custom')
 options=(staticlibs !strip !buildflags)
 url="https://xorg.freedesktop.org/"
 depends=("${_target}-pkg-config")
+makedepends=("${_target}-configure")
 source=(${url}/releases/individual/util/util-macros-${pkgver}.tar.bz2{,.sig})
 sha512sums=('3f51504b27f0478c136126f15110cf3cdbba218c4d74a8e974cca1381c6e8364609bd0c444f2fb19aa86a7f4e848dfce4f4da940463b224036f75a60b3d88619'
             'SKIP')

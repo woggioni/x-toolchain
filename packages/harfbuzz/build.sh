@@ -10,7 +10,7 @@ url="http://www.freedesktop.org/wiki/Software/HarfBuzz"
 arch=(x86_64)
 license=(MIT)
 options=('staticlibs' '!strip' '!buildflags')
-makedepends=(git python)
+makedepends=(git python "${_target}-configure")
 _commit=007a2a4317227b8fb4c764c590203c85fc3da5fd  # tags/1.7.4^0
 source=("git+https://anongit.freedesktop.org/git/harfbuzz#commit=$_commit")
 sha256sums=('SKIP')

@@ -8,6 +8,7 @@ _basename="${pkgname#${_target}-}"
 pkgver=2.4.0
 pkgrel=13
 depends=("${_target}-gcc")
+makedepends=("${_target}-configure")
 pkgdesc="FASTCgi (fcgi) is a language independent, high performant extension to CGI"
 arch=(any)
 license=('custom')

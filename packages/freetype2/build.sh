@@ -11,11 +11,11 @@ url="https://www.freetype.org/"
 options=('staticlibs' '!strip' '!buildflags')
 # adding harfbuzz for improved OpenType features auto-hinting
 # introduces a cycle dep to harfbuzz depending on freetype wanted by upstream
-depends=("${_target}-gcc" 
+depends=("${_target}-gcc"
          "${_target}-zlib"
          "${_target}-bzip2"
          "${_target}-libpng" "sh")
-makedepends=("libx11")
+makedepends=("libx11" "${_target}-configure")
 source=(https://download-mirror.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2{,.sig}
         0001-Enable-table-validation-modules.patch
         0002-Enable-infinality-subpixel-hinting.patch

@@ -12,6 +12,7 @@ url="https://www.gnupg.org"
 license=('LGPL')
 options=(staticlibs !strip !buildflags)
 depends=("${_target}-gcc" 'sh')
+makedepends=("${_target}-configure")
 source=(ftp://ftp.gnupg.org/gcrypt/libgpg-error/${_basename}-${pkgver}.tar.bz2{,.sig})
 	#ftp://ftp.franken.de/pub/crypt/mirror/ftp.gnupg.org/gcrypt/libgpg-error/${pkgname}-${pkgver}.tar.bz2)
 # https://www.gnupg.org/download/integrity_check.html
@@ -22,12 +23,12 @@ validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6'  # Werner Koch
 build() {
   cd ${_basename}-${pkgver}
 
-  if [[ $_os == linux* ]] && [[ $_cpu == x86_64 ]]
+  if [[ $_os == linux* ]] && [[ $_cpu == x86_64 ]] && [[ ${_os} == "linux-musl" ]]
   then
-    _vendor="pc"
+    cp src/syscfg/lock-obj-pub.x86_64-pc-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
   elif [[ $_os == linux* ]] && [[ $_cpu == arm ]]
   then
-    _vendor="unknown"
+    cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
   fi
 
   ./configure --build="$CHOST" --host="${_cpu}-${_vendor}-${_os}" --target="${_cpu}-${_vendor}-${_os}" \

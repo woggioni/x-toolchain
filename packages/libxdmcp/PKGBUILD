@@ -12,7 +12,7 @@ url="https://xorg.freedesktop.org/"
 license=('custom')
 options=(staticlibs !strip !buildflags)
 depends=("${_target}-xproto" "${_target}-gcc")
-makedepends=("${_target}-xorg-util-macros")
+makedepends=("${_target}-xorg-util-macros" "${_target}-configure")
 source=(${url}/releases/individual/lib/libXdmcp-${pkgver}.tar.bz2{,.sig})
 sha256sums=('81fe09867918fff258296e1e1e159f0dc639cb30d201c53519f25ab73af4e4e2'
             'SKIP')

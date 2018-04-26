@@ -13,7 +13,7 @@ arch=(x86_64)
 license=(MIT)
 options=(staticlibs !strip !buildflags)
 depends=("${_target}-zlib" "${_target}-readline" "${_target}-ncurses" "${_target}-xz" "${_target}-icu")
-makedepends=("${_target}-python" git)
+makedepends=("${_target}-python" git "${_target}-configure")
 _commit=18890f471c420411aa3c989e104d090966ec9dbf  # tags/v2.9.8^0
 source=(git+https://git.gnome.org/browse/libxml2#commit=$_commit
         https://www.w3.org/XML/Test/xmlts20130923.tar.gz)

@@ -12,7 +12,7 @@ url="https://xorg.freedesktop.org/"
 options=(staticlibs !strip !buildflags)
 license=('custom')
 depends=("${_target}-libx11" "${_target}-xextproto")
-makedepends=('xorg-util-macros')
+makedepends=("${_target}-xorg-util-macros" "${_target}-configure")
 source=(${url}/releases/individual/lib/libXext-${pkgver}.tar.bz2{,.sig})
 sha256sums=('b518d4d332231f313371fdefac59e3776f4f0823bcb23cf7c7305bfb57b16e35'
             'SKIP')

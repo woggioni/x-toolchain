@@ -1,0 +1,32 @@
+# $Id$
+# Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Contributor: Stéphane Gaudreault <stephane@archlinux.org>
+# Contributor: Jan de Groot <jgc@archlinux.org>
+
+pkgname=${_target}-libffi
+_basename="${pkgname#${_target}-}"
+pkgver=3.2.1
+pkgrel=2
+pkgdesc='Portable foreign function interface library'
+arch=('x86_64')
+url='http://sourceware.org/libffi/'
+license=('MIT')
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-gcc")
+makedepends=("${_target}-configure")
+source=(ftp://sourceware.org/pub/libffi/libffi-$pkgver.tar.gz)
+sha1sums=('280c265b789e041c02e5c97815793dfc283fb1e6')
+
+build() {
+  cd $_basename-$pkgver
+  ${_target}-configure --enable-pax_emutramp .
+  make
+}
+
+package() {
+  cd $_basename-$pkgver
+  make DESTDIR="$pkgdir" install
+  install -Dm644 LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
+}

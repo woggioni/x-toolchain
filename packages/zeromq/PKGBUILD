@@ -9,7 +9,7 @@ arch=('x86_64')
 url="http://www.zeromq.org"
 license=('LGPL')
 depends=("${_target}-gcc" "${_target}-libsodium")
-makedepends=('asciidoc' 'xmlto')
+makedepends=('asciidoc' 'xmlto' "${_target}-configure")
 options=(!strip !buildflags staticlibs)
 # "http://download.zeromq.org/$pkgname-$pkgver.tar.gz"
 source=("https://github.com/zeromq/libzmq/releases/download/v$pkgver/zeromq-$pkgver.tar.gz"

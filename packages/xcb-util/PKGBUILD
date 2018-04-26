@@ -13,7 +13,7 @@ url="https://xcb.freedesktop.org"
 license=('custom')
 options=(staticlibs !strip !buildflags)
 depends=("${_target}-libxcb>=1.7")
-makedepends=('gperf' "${_target}-xorg-util-macros")
+makedepends=('gperf' "${_target}-xorg-util-macros" "${_target}-configure")
 source=("https://xcb.freedesktop.org/dist/${_basename}-${pkgver}.tar.bz2")
 sha256sums=('46e49469cb3b594af1d33176cd7565def2be3fa8be4371d62271fabb5eae50e9')
 
