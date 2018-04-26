@@ -1,0 +1,66 @@
+# $Id: PKGBUILD 240297 2015-06-03 10:22:03Z fyan $
+# Maintainer: Felix Yan <felixonmars@archlinux.org>
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+pkgname="${_target}-qt5-declarative"
+_basename="${pkgname#${_target}-}"
+_qtver=5.10.0
+pkgver=${_qtver/-/}
+pkgrel=3
+arch=('x86_64')
+url='http://qt-project.org/'
+license=('GPL3' 'LGPL3' 'FDL' 'custom')
+pkgdesc='Classes for QML and JavaScript languages'
+depends=("${_target}-qt5-xmlpatterns")
+makedepends=('python2' 'git')
+options=('staticlibs' '!strip' '!buildflags')
+groups=("${_target}-qt" "${_target}-qt5")
+conflicts=("${_target}-qtchooser" "${_target}-qt5-declarative-render2d")
+replaces=("${_target}-qt5-declarative-render2d")
+_pkgfqn="${_basename/5-/}-everywhere-src-${_qtver}"
+#_pkgfqn="qtbase-everywhere-src-${pkgver}"
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz"
+        qtbug-65789-2.patch::"https://github.com/qt/qtdeclarative/commit/602a6589.patch"
+        qtbug-67019.patch::"https://github.com/qt/qtdeclarative/commit/b1243b8c.patch")
+sha256sums=('5ccb4dbca5046554037bcffbb05918f6efcff321c44cd1c39b1c47be7e67711e'
+            'e516e969dcf9520a4e5f05291ffe4baef1a6e499248f342f66c39147ef06a272'
+            'eed0e2617d4d46452acc79438666bab46c0c797ec4cb9ab447037c4176d83aba')
+
+prepare() {
+  mkdir -p build
+
+  # Use python2 for Python 2.x
+  find -name '*.pro' -o -name '*.pri' | xargs sed -i -e 's|python -c|python2 -c|g' -e 's|python \$|python2 \$|g'
+
+  cd ${_pkgfqn}
+
+  # Fix two issues affecting display of SVG images
+  #patch -Np1 -i ../qtbug-65789-2.patch # https://bugreports.qt.io/browse/QTBUG-65789
+  #git apply -v ../qtbug-67019.patch    # https://bugreports.qt.io/browse/QTBUG-67019
+}
+
+build() {
+  cd build
+
+  export PYTHON=python2
+  ${_prefix}/${_target}/lib/qt/bin/qmake ../${_pkgfqn}
+  make
+}
+
+package() {
+  cd build
+  make INSTALL_ROOT="$pkgdir" install
+
+  # Symlinks for backwards compatibility
+  for b in "$pkgdir"${_prefix}/${_target}/bin/*; do
+    ln -s ${_prefix}/${_target}/bin/$(basename $b) "$pkgdir"${_prefix}/${_target}/bin/$(basename $b)-qt5
+  done
+
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+  find "$pkgdir/${_prefix}/${_target}/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+
+  #install -d "$pkgdir"/usr/share/licenses
+  #ln -s /usr/share/licenses/qt5-base "$pkgdir"/usr/share/licenses/${pkgname}
+}

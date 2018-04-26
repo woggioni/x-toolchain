@@ -1,0 +1,66 @@
+# $Id$
+# Maintainer: AndyRTR <andyrtr@archlinux.org>
+
+pkgname="${_target}-xorgproto"
+_basename="${pkgname#${_target}-}"
+pkgver=2018.4
+pkgrel=1
+pkgdesc="combined X.Org X11 Protocol headers"
+arch=('any')
+url="https://xorg.freedesktop.org/"
+license=('custom')
+options=(staticlibs !strip !buildflags)
+makedepends=("${_target}-xorg-util-macros" "${_target}-meson") # 'xmlto' 'libxslt' 'linuxdoc-tools' 'docbook-sgml' 'fop')
+provides=("${_target}-bigreqsproto" 
+          "${_target}-compositeproto" 
+          "${_target}-damageproto" 
+          "${_target}-dmxproto" 
+          "${_target}-dri2proto" 
+          "${_target}-dri3proto" 
+          "${_target}-fixesproto" 
+          "${_target}-fontsproto" 
+          "${_target}-glproto" 
+          "${_target}-inputproto" 
+          "${_target}-kbproto" 
+          "${_target}-presentproto" 
+          "${_target}-printproto" 
+          "${_target}-randrproto" 
+          "${_target}-recordproto"
+          "${_target}-renderproto"
+          "${_target}-resourceproto"
+          "${_target}-scrnsaverproto"
+          "${_target}-videoproto"
+          "${_target}-xcmiscproto"
+          "${_target}-xextproto"
+          "${_target}-xf86dgaproto"
+          "${_target}-xf86driproto"
+          "${_target}-xf86miscproto"
+          "${_target}-xf86vidmodeproto"
+          "${_target}-xineramaproto"
+          "${_target}-xproto")
+conflicts=("${provides[@]}")
+replaces=("${provides[@]}")
+source=(https://xorg.freedesktop.org/archive/individual/proto/${_basename}-$pkgver.tar.bz2{,.sig})
+sha512sums=('2db682d10280ca58cdc04d8eb9fef30c111d4cd379de9fec86cff317865b859a576de5426447be9231d24be9762cc1d684c57383a99ad499398e8b7d62b1c03c'
+            'SKIP')
+validpgpkeys=('995ED5C8A6138EB0961F18474C09DD83CAAA50B2') #  "Adam Jackson <ajax@nwnk.net>"
+validpgpkeys+=('DD38563A8A8224537D1F90E45B8A2D50A0ECD0D3') # "Adam Jackson <ajax@benzedrine.nwnk.net>"
+validpgpkeys+=('C383B778255613DFDB409D91DB221A6900000011') #  "Keith Packard <keithp@keithp.com>"
+
+prepare() {
+  mkdir build
+}
+
+build() {
+  ${_target}-meson ${_basename}-$pkgver build \
+    -Dlegacy=true
+  ninja -C build
+}
+
+package() {
+  DESTDIR="$pkgdir" ninja -C build install
+  # cleanup
+  install -d "${pkgdir}${_prefix}/${_target}/sysroot/lib/"
+  mv "${pkgdir}${_prefix}/${_target}/sysroot/share/pkgconfig" "${pkgdir}${_prefix}/${_target}/sysroot/lib/"
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

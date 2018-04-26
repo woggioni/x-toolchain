@@ -1,0 +1,31 @@
+# $Id$
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+
+pkgname=${_target}-libxext
+_basename="${pkgname#${_target}-}"
+pkgver=1.3.3
+pkgrel=1
+pkgdesc="X11 miscellaneous extensions library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+options=(staticlibs !strip !buildflags)
+license=('custom')
+depends=("${_target}-libx11" "${_target}-xextproto")
+makedepends=('xorg-util-macros')
+source=(${url}/releases/individual/lib/libXext-${pkgver}.tar.bz2{,.sig})
+sha256sums=('b518d4d332231f313371fdefac59e3776f4f0823bcb23cf7c7305bfb57b16e35'
+            'SKIP')
+validpgpkeys=('3C2C43D9447D5938EF4551EBE23B7E70B467F0BF') # "Peter Hutterer (Who-T) <office@who-t.net>"
+
+build() {
+  cd libXext-${pkgver}
+  ${_target}-configure --disable-malloc0returnsnull .
+  make
+}
+
+package() {
+  cd libXext-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

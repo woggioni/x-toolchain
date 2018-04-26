@@ -1,0 +1,30 @@
+# $Id$
+# Maintainer: AndyRTR <andyrtr@archlinux.org>
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Contributor: Alexander Baldeck <alexander@archlinux.org>
+
+pkgname="${_target}-libxau"
+_basename="${pkgname#${_target}-}"
+pkgver=1.0.8
+pkgrel=3
+pkgdesc="X11 authorisation library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-gcc" "${_target}-xproto")
+makedepends=("${_target}-pkg-config")
+license=('custom')
+source=(${url}/releases/individual/lib/libXau-${pkgver}.tar.bz2)
+sha256sums=('fdd477320aeb5cdd67272838722d6b7d544887dfe7de46e1e7cc0c27c2bea4f2')
+
+build() {
+  cd libXau-${pkgver}
+  ${_target}-configure .
+  make
+}
+
+package() {
+  cd libXau-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

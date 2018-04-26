@@ -1,0 +1,4 @@
+pkgname="${_target}-harfbuzz"
+conflicts=("${_target}-harfbuzz-bootstrap")
+depends=("${_target}-gcc" "${_target}-freetype2")
+source ./build.sh

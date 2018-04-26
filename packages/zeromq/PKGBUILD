@@ -1,0 +1,41 @@
+# $Id$
+# Maintainer: Kyle Keen <keenerd@gmail.com>
+pkgname=${_target}-zeromq
+_basename="${pkgname#${_target}-}"
+pkgver=4.2.2
+pkgrel=2
+pkgdesc="Fast messaging system built on sockets.  C and C++ bindings.  aka 0MQ, ZMQ."
+arch=('x86_64')
+url="http://www.zeromq.org"
+license=('LGPL')
+depends=("${_target}-gcc" "${_target}-libsodium")
+makedepends=('asciidoc' 'xmlto')
+options=(!strip !buildflags staticlibs)
+# "http://download.zeromq.org/$pkgname-$pkgver.tar.gz"
+source=("https://github.com/zeromq/libzmq/releases/download/v$pkgver/zeromq-$pkgver.tar.gz"
+        "zmq.hpp.$pkgver::https://raw.githubusercontent.com/zeromq/cppzmq/b0e6d4b/zmq.hpp")
+sha256sums=('5b23f4ca9ef545d5bd3af55d305765e3ee06b986263b31967435d285a3e6df6b'
+            '02b73219656df3ffe3b231c7d0326e754a738ef2a83c8e94cd1e47d22cdd9535')
+
+prepare() {
+  # Needed for new libsodium
+  sed -i 's/libzmq_werror="yes"/libzmq_werror="no"/' $_basename-$pkgver/configure
+  cp zmq.hpp.$pkgver zmq.hpp
+}
+
+build() {
+  cd "$srcdir/$_basename-$pkgver"
+  mkdir -p build-${_target} && pushd build-${_target}
+  ${_target}-configure --with-libsodium
+  make
+  popd
+}
+
+package() {
+  pushd "$srcdir/$_basename-$pkgver/build-${_target}"
+  make DESTDIR="$pkgdir" install
+  install -Dm644 "$srcdir/zmq.hpp" "$pkgdir/${_prefix}/${_target}/sysroot/usr/include/zmq.hpp"
+  popd
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}
+

@@ -1,0 +1,71 @@
+# Contributor: Filip Brcic <brcha@gna.org>
+# Contributor: Martchus <martchus@gmx.net>
+
+pkgname=${_target}-gettext
+pkgver=0.19.8.1
+pkgrel=3
+arch=('any')
+pkgdesc="GNU internationalization library (${_target})"
+#depends=("${_target}-termcap" "${_target}-libunistring")
+depends=("${_target}-libunistring")
+makedepends=('gettext' "${_target}-configure")
+options=(!strip !buildflags staticlibs)
+license=("GPL")
+url="http://www.gnu.org/software/gettext/"
+source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-${pkgver}.tar.gz"{,.sig}
+        "05-always-use-libintl-vsnprintf.mingw.patch"
+        "06-dont-include-ctype-after-gnulibs-wctype.mingw.patch"
+        "07-fix-asprintf-conflict.mingw.patch"
+        "08-vs-compatible.patch"
+        "09-gnulib-fix-underscore-cond.patch"
+        "intl.pc")
+md5sums=('97e034cf8ce5ba73a28ff6c3c0638092'
+         'SKIP'
+         '27852a388b8cf38188dc392c244230ff'
+         'f69747f43f279b8a81286cfe5916b82f'
+         '3ebccf730ec3377b068027eb2283afb2'
+         'f5b611172ae58f1e4589a8d0c1d53414'
+         'bed0da63d251975a21ca830f2f156766'
+         'b0a123ec7ad1a345d0d712dae986a543')
+validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871') # Daiki Ueno
+
+prepare() {
+  cd gettext-$pkgver
+  # patch -p0 -i ${srcdir}/05-always-use-libintl-vsnprintf.mingw.patch
+  # patch -p0 -i ${srcdir}/06-dont-include-ctype-after-gnulibs-wctype.mingw.patch
+  # patch -p0 -i ${srcdir}/07-fix-asprintf-conflict.mingw.patch
+  # patch -p0 -i ${srcdir}/08-vs-compatible.patch
+  # prevents "Cannot export rpl_printf: symbol not found"
+  # patch -p0 -i ${srcdir}/09-gnulib-fix-underscore-cond.patch
+}
+
+build() {
+  cd gettext-${pkgver}
+  unset LDFLAGS
+    mkdir -p build-${_target} && pushd build-${_target}
+    # define USER_LABEL_PREFIX_UNDERSCORE to prevent undefined reference to `__imp_exit_failure'
+    # and similar errors
+    local underscore_flag=''
+    [[ ${_target} == i686-w64-mingw32 ]] && underscore_flag='-DUSER_LABEL_PREFIX_UNDERSCORE'
+    export CFLAGS="$underscore_flag"
+    export CXXFLAGS="$underscore_flag"
+    ${_target}-configure \
+      --disable-java \
+      --disable-native-java \
+      --disable-csharp \
+      --without-emacs ..
+    make
+    popd
+}
+
+package() {
+    cd "${srcdir}/${pkgname#${_target}-}-$pkgver/build-${_target}"
+    make DESTDIR="$pkgdir" install
+    # provide pkgconfig file for iconv library
+    install -dm755 "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig"
+    install -m644 "$srcdir/intl.pc" "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig"
+    sed -i "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig/intl.pc" \
+      -e "s|@PREFIX[@]|/${_prefix}/${_target}|g" \
+      -e "s|@VERSION[@]|$pkgver|g"
+    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

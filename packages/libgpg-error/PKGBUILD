@@ -1,0 +1,43 @@
+# $Id$
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Contributor: judd <jvinet@zeroflux.org>
+
+pkgname="${_target}-libgpg-error"
+_basename="${pkgname#${_target}-}"
+pkgver=1.29
+pkgrel=1
+pkgdesc="Support library for libgcrypt"
+arch=(x86_64)
+url="https://www.gnupg.org"
+license=('LGPL')
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-gcc" 'sh')
+source=(ftp://ftp.gnupg.org/gcrypt/libgpg-error/${_basename}-${pkgver}.tar.bz2{,.sig})
+	#ftp://ftp.franken.de/pub/crypt/mirror/ftp.gnupg.org/gcrypt/libgpg-error/${pkgname}-${pkgver}.tar.bz2)
+# https://www.gnupg.org/download/integrity_check.html
+sha1sums=('a56241d60bb7d810fdb478463b1732b134a52a19'
+          'SKIP')
+validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6'  # Werner Koch
+              '031EC2536E580D8EA286A9F22071B08A33BD3F06') # NIIBE Yutaka (GnuPG Release Key) <gniibe@fsij.org>
+build() {
+  cd ${_basename}-${pkgver}
+
+  if [[ $_os == linux* ]] && [[ $_cpu == x86_64 ]]
+  then
+    _vendor="pc"
+  elif [[ $_os == linux* ]] && [[ $_cpu == arm ]]
+  then
+    _vendor="unknown"
+  fi
+
+  ./configure --build="$CHOST" --host="${_cpu}-${_vendor}-${_os}" --target="${_cpu}-${_vendor}-${_os}" \
+    --prefix=${_prefix}/${_target} --libdir=${_prefix}/${_target}/sysroot/lib --includedir=${_prefix}/${_target}/sysroot/usr/include \
+    --enable-shared --enable-static
+  make
+}
+
+package() {
+  cd ${_basename}-${pkgver}
+  make DESTDIR="${pkgdir}/" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

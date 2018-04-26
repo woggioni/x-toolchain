@@ -1,0 +1,29 @@
+# $Id$
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+
+pkgname="${_target}-xcb-util-image"
+_basename="${pkgname#${_target}-}"
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="Utility libraries for XC Binding - Port of Xlib's XImage and XShmImage functions"
+arch=('x86_64')
+url="https://xcb.freedesktop.org"
+license=('custom')
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-libxcb>=1.7" "${_target}-xcb-util>=0.3.9")
+makedepends=("${_target}-xorg-util-macros")
+source=("https://xcb.freedesktop.org/dist/${_basename}-${pkgver}.tar.bz2")
+sha256sums=('2db96a37d78831d643538dd1b595d7d712e04bdccf8896a5e18ce0f398ea2ffc')
+
+build() {
+  cd ${_basename}-${pkgver}
+  ${_target}-configure .
+  make
+}
+
+package() { 
+  cd ${_basename}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

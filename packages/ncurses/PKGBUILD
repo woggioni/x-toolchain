@@ -1,0 +1,49 @@
+# $Id$
+# Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Contributor: Allan McRae <allan@archlinux.org>
+# Contributor: judd <jvinet@zeroflux.org>
+pkgname=${_target}-ncurses
+_pkgver=6.1
+pkgver=${_pkgver/-/+}
+pkgrel=3
+pkgdesc='System V Release 4.0 curses emulation library'
+arch=(x86_64)
+url='http://invisible-island.net/ncurses/ncurses.html'
+license=(MIT)
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-gcc")
+source=(https://ftp.gnu.org/pub/gnu/ncurses/ncurses-$pkgver.tar.gz{,.sig})
+md5sums=('98c889aaf8d23910d2b92d65be2e737a'
+         'SKIP')
+validpgpkeys=('C52048C0C0748FEE227D47A2702353E0F7E48EDB')  # Thomas Dickey
+
+build() {
+  cd ${pkgname##${_target}-}-${_pkgver}
+
+  ${_target}-configure --with-pkg-config-libdir="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
+    --with-shared --with-normal --without-debug --without-ada \
+    --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared --includedir="${_prefix}/${_target}/sysroot/usr/include" \
+    --with-termlib=tinfo --with-ticlib=tic .
+  make
+}
+
+package() {
+  cd ${pkgname##${_target}-}-${_pkgver}
+  make DESTDIR="$pkgdir" install
+  #rm "${pkgdir}${_prefix}/${_target}/lib/terminfo"
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+
+  # fool packages looking to link to non-wide-character ncurses libraries
+  for lib in ncurses ncurses++ form panel menu; do
+    echo "INPUT(-l${lib}w)" > "${pkgdir}/${_prefix}/${_target}/sysroot/lib/lib${lib}.so"
+    ln -s ${lib}w.pc "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig/${lib}.pc"
+  done
+
+  # don't require -ltinfo when linking with --no-add-needed
+  rm -f "${pkgdir}${_prefix}/${_target}/sysroot/lib/libncursesw.so"
+  echo "INPUT(libncursesw.so.${pkgver:0:1} -ltinfo)" > "${pkgdir}${_prefix}/${_target}/sysroot/lib/libncursesw.so"
+
+  # some packages look for -lcurses during build
+  echo "INPUT(-lncursesw)" > "${pkgdir}/${_prefix}/${_target}/sysroot/lib/libcursesw.so"
+  ln -s libncurses.so "${pkgdir}/${_prefix}/${_target}/sysroot/lib/libcurses.so"
+}

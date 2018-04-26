@@ -1,0 +1,26 @@
+pkgname=${_target}-gsl
+pkgver=2.4
+pkgrel=1
+pkgdesc="The GNU Scientific Library (GSL) is a modern numerical library for C and C++ programmers (${_target})"
+arch=(any)
+url="http://www.gnu.org/software/gsl/gsl.html"
+license=("GPL")
+makedepends=("${_target}-configure")
+depends=("${_target}-gcc")
+options=('staticlibs' '!strip' '!buildflags')
+source=("http://ftp.gnu.org/gnu/gsl/gsl-$pkgver.tar.gz")
+sha1sums=('5db17d71306139b811a218d8a8cf98e12e1f58ae')
+
+build() {
+  cd "$srcdir/gsl-$pkgver"
+    mkdir -p build-${_target} && pushd build-${_target}
+    ${_target}-configure
+    make
+    popd
+}
+
+package() {
+    cd "${srcdir}/gsl-${pkgver}/build-${_target}"
+    make DESTDIR="$pkgdir" install
+    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

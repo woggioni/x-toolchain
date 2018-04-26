@@ -1,0 +1,43 @@
+# Contributor: Filip Brcic <brcha@gna.org>
+# Updated by ant32 <antreimer@gmail.com>
+
+pkgname=${_target}-termcap
+_basename="${pkgname#${_target}-}"
+pkgver=1.3.1
+pkgrel=8
+arch=(any)
+pkgdesc="Terminal feature database (mingw-w64)"
+depends=(${_target}-gcc)
+makedepends=(${_target}-configure)
+options=(!strip !buildflags staticlibs)
+license=(GPL LGPL)
+groups=("${_target}")
+url="ftp://ftp.gnu.org/gnu/termcap/"
+source=("http://ftp.gnu.org/gnu/termcap/termcap-${pkgver}.tar.gz")
+md5sums=('ffe6f86e63a3a29fa53ac645faaabdfa')
+
+build()
+{
+  cd "$srcdir/termcap-$pkgver"
+  autoconf
+    mkdir -p build-${_target} && pushd build-${_target}
+    ${_target}-configure
+    make
+    # Build a shared library.  No need for -fPIC on Windows.
+    ${_target}-gcc -fPIC -c "${srcdir}/${_basename}-${pkgver}/${_basename}.c" \
+        -o "${srcdir}"/"${_basename}.o" \
+        -DHAVE_STRING_H=1 -DHAVE_UNISTD_H=1 -DSTDC_HEADERS=1 || return 1
+    ${_target}-gcc -shared -Wl,-soname,"lib${_basename}.so" \
+        -o "${srcdir}/lib${_basename}.so" "${srcdir}/${_basename}.o" || return 1
+
+    popd
+}
+
+package() {
+    cd "$srcdir/termcap-$pkgver/build-${_target}"
+    # make install has no support for destdir
+    make install prefix="${pkgdir}/${_prefix}/${_target}" exec_prefix="${pkgdir}/${_prefix}/${_target}" oldincludedir=
+    install -m 0644 ${srcdir}/lib${_basename}.so "${pkgdir}/${_prefix}/${_target}/lib"
+    ln -s ${_prefix}/${_target}/lib/lib${_basename}.so ${pkgdir}/${_prefix}/${_target}/lib/lib${_basename}.so.${pkgver}  
+    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

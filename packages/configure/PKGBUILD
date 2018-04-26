@@ -1,0 +1,20 @@
+pkgname="${_target}-configure"
+pkgver=0.1
+pkgrel=1
+arch=(any)
+pkgdesc="configure wrapper for MinGW (mingw-w64)"
+depends=("${_target}-pkg-config")
+license=("GPL")
+url="http://fedoraproject.org/wiki/MinGW"
+source=("x-configure.sh")
+md5sums=('SKIP')
+
+build() {
+    sed -e "s|@PREFIX@|${_prefix}|g" -e "s|@TRIPLE@|${_target}|g" x-configure.sh > ${_target}-configure
+}
+
+package() {
+    install -d "${pkgdir}/${_prefix}/bin"
+    install -m 555 "${_target}-configure" "${pkgdir}/${_prefix}/bin"
+}
+

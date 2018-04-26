@@ -1,0 +1,50 @@
+# $Id$
+# Maintainer: Gaetan Bisson <bisson@archlinux.org>
+# Contributor: Allan McRae <allan@archlinux.org>
+# Contributor: Simone Sclavi 'Ito' <darkhado@gmail.com>
+pkgname="${_target}-libjpeg-turbo"
+_basename="${pkgname#${_target}-}"
+pkgver=1.5.3
+pkgrel=1
+pkgdesc='JPEG image codec with accelerated baseline compression and decompression'
+url='https://libjpeg-turbo.org/'
+arch=('x86_64')
+license=('custom')
+depends=("${_target}-gcc")
+makedepends=("${_target}-configure")
+options=('staticlibs' '!strip' '!buildflags')
+validpgpkeys=('7D6293CC6378786E1B5C496885C7044E033FDE16')
+source=("https://downloads.sourceforge.net/project/${_basename}/${pkgver}/${_basename}-${pkgver}.tar.gz"{,.sig})
+sha256sums=('b24890e2bb46e12e72a79f7e965f409f4e16466d00e1dd15d93d73ee6b592523'
+            'SKIP')
+
+provides=("${_target}-libjpeg=8.1.2" "${_target}-turbojpeg")
+conflicts=("${_target}-libjpeg" "${_target}-turbojpeg")
+replaces=("${_target}-libjpeg" "${_target}-turbojpeg")
+
+prepare() {
+	cd "${srcdir}/${_basename}-${pkgver}"
+	sed 's/Szathmáry/Szathmary/g' -i java/org/libjpegturbo/turbojpeg/*.java
+}
+
+build() {
+	cd "${srcdir}/${_basename}-${pkgver}"
+    mkdir -p build-${_target} && pushd build-${_target}
+
+	# make the build reproducible
+	_build=$(date --utc --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m%d)
+
+	${_target}-configure \
+		--with-jpeg8 \
+		--with-build-date=$_build
+	make
+}
+
+package() {
+	cd "${srcdir}/${_basename}-${pkgver}/build-${_target}"
+	make \
+		DESTDIR="${pkgdir}" \
+		install
+	install -m 644 ../jpegint.h "${pkgdir}/${_prefix}/${_target}/sysroot/usr/include" # required by other software
+	find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so*' -type f -exec ${_target}-strip -g {} \;
+}

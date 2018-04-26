@@ -1,0 +1,58 @@
+# $Id$
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Contributor: Tom Newsom <Jeepster@gmx.co.uk>
+
+pkgname="${_target}-sqlite"
+_srcver=3210000
+_docver=${_srcver}
+#_docver=3080001
+pkgver=3.21.0
+pkgrel=1
+pkgdesc="A C library that implements an SQL database engine"
+arch=('x86_64')
+license=('custom:Public Domain')
+url="http://www.sqlite.org/"
+depends=("${_target}-gcc" "${_target}-readline")
+makedepends=("${_target}-readline")
+source=("http://www.sqlite.org/2017/sqlite-autoconf-$_srcver.tar.gz")
+options=('!emptydirs' '!makeflags' 'staticlibs' '!strip' '!buildflags') # json extensions breaks parallel build
+sha1sums=('SKIP')
+
+prepare() {
+  pushd "${srcdir}/sqlite-autoconf-${_srcver}"
+  mkdir -p build-${_target} && pushd build-${_target}
+#  autoreconf -vfi
+  popd
+  popd
+}
+
+build() {
+  export CPPFLAGS="$CPPFLAGS -DSQLITE_ENABLE_COLUMN_METADATA=1 \
+                             -DSQLITE_ENABLE_UNLOCK_NOTIFY \
+                             -DSQLITE_ENABLE_DBSTAT_VTAB=1 \
+                             -DSQLITE_ENABLE_FTS3_TOKENIZER=1 \
+                             -DSQLITE_SECURE_DELETE \
+                             -DSQLITE_MAX_VARIABLE_NUMBER=250000 \
+                             -DSQLITE_MAX_EXPR_DEPTH=10000"
+
+  # build sqlite
+  pushd "${srcdir}/sqlite-autoconf-${_srcver}/build-${_target}"
+  ${_target}-configure \
+	--enable-fts5 \
+	--enable-json1 .
+  make
+  popd
+}
+
+package() {
+
+  pkgdesc="A C library that implements an SQL database engine"
+  provides=("${_target}-sqlite3=$pkgver")
+  replaces=("${_target}-sqlite3")
+
+  pushd "${srcdir}/sqlite-autoconf-${_srcver}/build-${_target}"
+  make DESTDIR=${pkgdir} install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  popd
+}
+

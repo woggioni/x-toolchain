@@ -1,0 +1,36 @@
+# $Id$
+# Maintainer: Felix Yan <felixonmars@archlinux.org>
+
+pkgname="${_target}-mpdecimal"
+_basename="${pkgname#${_target}-}"
+
+pkgver=2.4.2
+pkgrel=1
+pkgdesc="Package for correctly-rounded arbitrary precision decimal floating point arithmetic"
+arch=('x86_64')
+url="http://www.bytereef.org/mpdecimal/index.html"
+license=('custom')
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-gcc")
+source=("http://www.bytereef.org/software/${_basename}/releases/${_basename}-$pkgver.tar.gz")
+sha512sums=('eb18ad53b81b93c469db4d915bbb3fae21b36ad82a88e01fef3a6946ac5f50b54376e259a5ecbe23836f1efd59d226b942ecdee87eaba7f9e75cdcaaa9499ef7')
+
+build() {
+  pushd "${srcdir}/${_basename}-${pkgver}"
+  export CC=${_target}-gcc
+  # ${_target}-configure "${srcdir}/${_basename}-${pkgver}"
+  _os="${_os%-musl}"
+  ./configure \
+      --prefix="${_prefix}/${_target}/sysroot" \
+      --includedir="${_prefix}/${_target}/sysroot/usr/include" \
+      --host="${_cpu}-unknown-${_os}" MACHINE=ansi64
+  make
+  popd 
+}
+
+package() {
+  pushd "${srcdir}/${_basename}-${pkgver}"
+  make DESTDIR="$pkgdir" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  popd
+}

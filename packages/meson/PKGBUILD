@@ -1,0 +1,22 @@
+pkgname="${_target}-meson"
+pkgver=1
+pkgrel=18
+arch=('any')
+pkgdesc="Meson wrapper for x-toolxhain"
+depends=('meson' "${_target}-pkg-config")
+license=("GPL")
+url="http://fedoraproject.org/wiki/MinGW"
+source=("x-meson.sh" "x-toolchain.meson")
+md5sums=('SKIP' 'SKIP')
+
+build() {
+    sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" -e "s|@CPU@|${_cpu}|g" -e "s|@OS@|${_os}|g" x-toolchain.meson > toolchain-${_target}.meson
+    sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" x-meson.sh > ${_target}-meson
+}
+
+package() {
+  install -d "${pkgdir}${_prefix}/meson"
+  install -m 644 toolchain-${_target}.meson "${pkgdir}${_prefix}/meson"
+  install -d "${pkgdir}${_prefix}/bin"
+  install -m 755 ${_target}-meson "${pkgdir}${_prefix}/bin"
+}

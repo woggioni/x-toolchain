@@ -1,0 +1,31 @@
+# $Id$
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+
+pkgname="${_target}-xcb-util-keysyms"
+_basename="${pkgname#${_target}-}"
+pkgver=0.4.0
+pkgrel=1
+pkgdesc="Utility libraries for XC Binding - Standard X key constants and conversion to/from keycodes"
+arch=('x86_64')
+url="https://xcb.freedesktop.org"
+license=('custom')
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-libxcb>=1.7")
+makedepends=("${_target}-xorg-util-macros")
+source=("https://xcb.freedesktop.org/dist/${_basename}-${pkgver}.tar.bz2"
+        'LICENSE')
+sha256sums=('0ef8490ff1dede52b7de533158547f8b454b241aa3e4dcca369507f66f216dd9'
+            'ded299aa179dcf0d885bf89274a4db77a530e03f9f5e7cf1c3c4ef1d60e914b9')
+
+build() {
+  cd ${_basename}-${pkgver}
+  ${_target}-configure .
+  make
+}
+
+package() { 
+  cd ${_basename}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

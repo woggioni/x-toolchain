@@ -1,0 +1,77 @@
+# $Id$
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+# Contributor: Tom Gundersen <teg@jklm.no>
+# Contributor: John Proctor <jproctor@prium.net>
+
+pkgname="${_target}-python"
+_basename="${pkgname#${_target}-}"
+pkgver=3.6.5
+pkgrel=1
+pkgdesc="Next generation of the python high-level scripting language"
+url="http://www.python.org/"
+arch=('x86_64')
+license=('custom')
+options=(staticlibs !strip !buildflags)
+#depends=('expat' 'bzip2' 'gdbm' 'openssl' 'libffi' 'zlib' 'libnsl')
+depends=("${_target}-gcc" 
+         "${_target}-expat" 
+         "${_target}-zlib" 
+         "${_target}-bzip2" 
+         "${_target}-openssl"
+         "${_target}-mpdecimal"
+         )
+makedepends=("cmake" "ninja" "ccache" git)
+source=(
+    "https://www.python.org/ftp/python/${pkgver}/Python-${pkgver}.tgz"
+    "config.site"
+    "dont-make-libpython-readonly.patch"
+)
+sha256sums=('SKIP' 'SKIP' 
+            'a2be8b0573072ae3332bba2ccc646f0d5280af354a59066149f9a92b5f48c64a')
+provides=("${_target}-python3")
+replaces=("${_target}-python3")
+
+prepare() {
+  cd Python-${pkgver}
+
+  # FS#45809
+  patch -p1 -i ../dont-make-libpython-readonly.patch
+
+  # FS#23997
+  sed -i -e "s|^#.* /usr/local/bin/python|#!/usr/bin/python|" Lib/cgi.py
+
+  # Ensure that we are using the system copy of various libraries (expat, zlib, libffi, and libmpdec),
+  # rather than copies shipped in the tarball
+  rm -r Modules/expat
+  rm -r Modules/zlib
+  rm -r Modules/_ctypes/{darwin,libffi}*
+  rm -r Modules/_decimal/libmpdec
+}
+
+build() {
+  mkdir build
+  pushd build
+  export PKG_CONFIG_LIBDIR="${_prefix}/${_target}/sysroot/lib/pkgconfig"
+  CONFIG_SITE="${srcdir}/config.site" ${_target}-configure \
+              --enable-shared \
+              --with-threads \
+              --with-computed-gotos \
+              --enable-optimizations \
+              --enable-ipv6 \
+              --with-system-expat \
+              --with-system-ffi \
+              --with-system-libmpdec \
+              --enable-loadable-sqlite-extensions \
+              --without-ensurepip \
+              "../Python-${pkgver}"
+    make
+  popd
+}
+
+package() {
+#   cmake --build build --target install
+  pushd build
+  make install DESTDIR="${pkgdir}"
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  popd
+}

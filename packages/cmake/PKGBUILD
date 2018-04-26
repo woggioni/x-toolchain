@@ -1,0 +1,28 @@
+pkgname="${_target}-cmake"
+pkgver=1
+pkgrel=18
+arch=('any')
+pkgdesc="CMake wrapper for x-toolxhain"
+depends=('cmake' "${_target}-pkg-config")
+license=("GPL")
+url="http://fedoraproject.org/wiki/MinGW"
+source=("x-cmake.sh"
+        "x-toolchain.cmake")
+md5sums=('SKIP' 'SKIP')
+
+build() {
+    if [[ ${_os} == linux* ]]
+    then 
+        _os="Linux"
+    fi
+    sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" -e "s|@CPU@|${_cpu}|g" -e "s|@OS@|${_os}|g" x-toolchain.cmake > toolchain-${_target}.cmake
+    sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" x-cmake.sh > ${_target}-cmake
+}
+
+package() {
+  install -d "${pkgdir}${_prefix}/bin"
+  install -d "${pkgdir}${_prefix}/cmake"
+  install -m 644 toolchain-${_target}.cmake "${pkgdir}${_prefix}/cmake"
+  install -m 755 ${_target}-cmake "${pkgdir}${_prefix}/bin"
+}
+

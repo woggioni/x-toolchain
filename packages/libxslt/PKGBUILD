@@ -1,0 +1,48 @@
+# $Id$
+# Maintainer: Eric Belanger <eric@archlinux.org>
+# Contributor: John Proctor <jproctor@prium.net>
+
+pkgname="${_target}-libxslt"
+_basename="${pkgname#${_target}-}"
+pkgver=1.1.32+3+g32c88216
+pkgrel=1
+pkgdesc="XML stylesheet transformation library"
+url="http://xmlsoft.org/XSLT/"
+arch=(x86_64)
+license=(custom)
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-libxml2" "${_target}-libgcrypt")
+makedepends=(git)
+checkdepends=(docbook-xml)
+_commit=32c88216ddbaa0f3491f45bc84ee89285c6a1129  # master
+source=("git+https://git.gnome.org/browse/libxslt#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd $_basename
+  git describe --tags | sed 's/^v//;s/-/+/g'
+}
+
+prepare() {
+  cd $_basename
+
+  sed -e 's|/usr/bin/python -u|/usr/bin/python2 -u|g' \
+      -e 's|/usr/bin/python$|/usr/bin/python2|g' \
+      -i python/tests/*.py
+
+  NOCONFIGURE=1 ./autogen.sh
+}
+
+build() {
+  cd $_basename
+  ${_target}-configure .
+  sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+  make
+}
+
+package() {
+  cd $_basename
+  make DESTDIR="$pkgdir" install
+  find "$pkgdir" -name '*.a' -print -delete
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

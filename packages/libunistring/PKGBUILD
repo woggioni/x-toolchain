@@ -1,0 +1,27 @@
+pkgname="${_target}-libunistring"
+pkgver=0.9.7
+pkgrel=1
+pkgdesc="Library for manipulating Unicode strings and C strings. (${_target})"
+arch=(any)
+url="http://www.gnu.org/software/libunistring/"
+license=("GPL")
+makedepends=("${_target}-configure")
+depends=("${_target}-gcc")
+options=(staticlibs !strip !buildflags)
+source=("http://ftp.gnu.org/gnu/libunistring/libunistring-${pkgver}.tar.gz")
+md5sums=('8e663454aa372181ee8e46edaa3ba4c8')
+
+build() {
+	cd "${srcdir}/libunistring-${pkgver}"
+    unset LDFLAGS
+    mkdir -p build-${_target} && pushd build-${_target}
+    ${_target}-configure
+    make
+    popd
+}
+
+package() {
+    cd "${srcdir}/libunistring-${pkgver}/build-${_target}"
+    make DESTDIR="$pkgdir" install
+    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

@@ -1,0 +1,20 @@
+[binaries]
+c = '@PREFIX@/bin/@TRIPLE@-gcc'
+cpp = '@PREFIX@/bin/@TRIPLE@-g++'
+ld = '@PREFIX@/bin/@TRIPLE@-ld'
+ar = '@PREFIX@/bin/@TRIPLE@-ar'
+strip = '@PREFIX@/bin/@TRIPLE@-strip'
+pkgconfig = '@PREFIX@/bin/@TRIPLE@-pkg-config'
+#exe_wrapper = '@PREFIX@/@TRIPLE@/lib/ld-linux.so'
+
+[host_machine]
+system = '@OS@'
+cpu_family = '@CPU@'
+cpu = 'sandybridge'
+endian = 'little'
+
+[target_machine]
+system = '@OS@'
+cpu_family = '@CPU@'
+cpu = 'sandybridge'
+endian = 'little'

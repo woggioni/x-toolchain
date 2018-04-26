@@ -1,0 +1,31 @@
+# $Id$
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+
+pkgname="${_target}-libxdmcp"
+_basename="${pkgname#${_target}-}"
+pkgver=1.1.2
+pkgrel=1
+pkgdesc="X11 Display Manager Control Protocol library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('custom')
+options=(staticlibs !strip !buildflags)
+depends=("${_target}-xproto" "${_target}-gcc")
+makedepends=("${_target}-xorg-util-macros")
+source=(${url}/releases/individual/lib/libXdmcp-${pkgver}.tar.bz2{,.sig})
+sha256sums=('81fe09867918fff258296e1e1e159f0dc639cb30d201c53519f25ab73af4e4e2'
+            'SKIP')
+validpgpkeys=('4A193C06D35E7C670FA4EF0BA2FB9E081F2D130E') # Alan Coopersmith <alan.coopersmith@oracle.com>
+
+build() {
+  cd libXdmcp-${pkgver}
+  ${_target}-configure .
+  make
+}
+
+package() {
+  cd libXdmcp-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}

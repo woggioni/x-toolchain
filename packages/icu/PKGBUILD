@@ -1,0 +1,50 @@
+# $Id$
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Contributor: Art Gramlich <art@gramlich-net.com>
+pkgname="${_target}-icu"
+_basename="${pkgname#${_target}-}"
+pkgver=60.2
+pkgrel=1
+pkgdesc="International Components for Unicode library"
+arch=(x86_64)
+url="http://www.icu-project.org/"
+options=('staticlibs' '!strip' '!buildflags')
+license=('custom:icu')
+depends=('sh')
+depends=("${_target}-gcc" "${_target}-zlib" "${_target}-bzip2")
+makedepends=("${_target}-configure")
+# no https available
+source=(#http://download.icu-project.org/files/${_basename}4c/${pkgver}/${_basename}4c-${pkgver/./_}-src.tgz
+        https://ssl.icu-project.org/files/${_basename}4c/${pkgver}/${_basename}4c-${pkgver//./_}-src.tgz{,.asc})
+# upstream offers md5sum checks, only asc file for md5sum check
+md5sums=('43861b127744b3c0b9d7f386f4b9fa40'
+         'SKIP')
+validpgpkeys=('BA90283A60D67BA0DD910A893932080F4FB419E3') #  "Steven R. Loomis (filfla-signing) <srloomis@us.ibm.com>" 
+validpgpkeys+=('9731166CD8E23A83BEE7C6D3ACA5DBE1FD8FABF1') #  "Steven R. Loomis (ICU Project) <srl@icu-project.org>" 
+
+build() {
+  cd icu/source
+  mkdir -p nativebuild && pushd nativebuild
+  CFLAGS=-fno-stack-protector
+  CC=gcc CXX=g++ ../configure --enable-static --disable-shared
+  make
+  popd
+  mkdir -p build-${_target} && pushd build-${_target}
+  ${_target}-configure \
+      --with-cross-build=$PWD/../nativebuild \
+      --with-data-packaging=library \
+      --disable-rpath \
+      --enable-release \
+      --disable-tests \
+      --disable-samples
+  make
+  popd
+}
+
+package() {
+  cd icu/source
+  pushd build-${_target}
+  make -j1 DESTDIR=${pkgdir} install
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  popd
+}
