@@ -1,0 +1,42 @@
+# $Id$
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+
+pkgname="${_target}-libxcomposite"
+_basename="${pkgname#${_target}-}"
+pkgver=0.4.4
+pkgrel=2
+pkgdesc="X11 Composite extension library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('custom')
+options=('staticlibs' '!strip' '!buildflags')
+depends=("${_target}-libxfixes" "${_target}-compositeproto")
+makedepends=("${_target}-xorg-util-macros")
+source=("${url}/releases/individual/lib/libXcomposite-${pkgver}.tar.bz2" "config.sub")
+sha256sums=(
+  'ede250cd207d8bee4a338265c3007d7a68d5aca791b6ac41af18e9a2aeb34178'
+  '1ee0b1581032c46aac6ebd1de74b130f35082fb45a12e9ead42ad5c775f9b64f'
+  )
+
+
+prepare () {
+  cd libXcomposite-${pkgver}
+  chmod +w config.sub
+  cp ${srcdir}/config.sub .
+  chmod -w config.sub
+}
+
+build() {
+  cd libXcomposite-${pkgver}
+  ${_target}-configure .
+  make
+}
+
+package() {
+  cd libXcomposite-${pkgver}
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/${_prefix}/${_target}/sysroot/share/licenses/${_basename}"
+  install -m644 COPYING "${pkgdir}/${_prefix}/${_target}/sysroot/share/licenses/${_basename}"
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}
