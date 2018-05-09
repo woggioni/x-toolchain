@@ -206,8 +206,8 @@ build() {
       -system-pcre \
       -xcb-xlib -system-xcb -qt-xkbcommon \
       -xplatform ${_target} \
-      -hostprefix ${_prefix}/${_target}/sysroot \
-      -hostdatadir ${_prefix}/${_target}/sysroot/lib/qt \
+      -hostprefix ${_prefix}/${_target} \
+      -hostdatadir ${_prefix}/${_target}/lib/qt \
       -hostbindir ${_prefix}/${_target}/bin \
       -prefix ${_prefix}/${_target}/sysroot \
       -bindir ${_prefix}/${_target}/sysroot/bin \
@@ -234,12 +234,13 @@ package() {
   # rm -r "${pkgdir}/${_prefix}/${_target}/share"
   # strip -s "${pkgdir}/${_prefix}/${_target}/bin"/*
   install -d "${pkgdir}/${_prefix}/bin/"
-  for tool in $(ls "${pkgdir}/${_prefix}/${_target}/bin"); do
+  for tool in "${pkgdir}/${_prefix}/${_target}/bin/"* 
+  do
     if  [[ ${tool} != *.pl ]]
     then
-      strip -s "${pkgdir}/${_prefix}/${_target}/bin/${tool}"
+      strip -s "${tool}"
     fi
-    ln -s "${_prefix}/${_target}/bin/${tool}" "${pkgdir}/${_prefix}/bin/${_target}-${tool}"
+    ln -s "/${tool}" "${pkgdir}/${_prefix}/bin/${_target}-$(basename ${tool})"
   done
   find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -name '*.a' -name '*.so*' -type f -exec ${_arch}-strip -g {} \;
   find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -name '*.prl' -type f -exec \

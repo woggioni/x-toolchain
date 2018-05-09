@@ -66,7 +66,6 @@ build() {
 }
 
 package() {
-#   cmake --build build --target install
   pushd build
   make install DESTDIR="${pkgdir}"
   find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;

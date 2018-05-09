@@ -1,4 +1,4 @@
 pkgname="${_target}-harfbuzz"
 conflicts=("${_target}-harfbuzz-bootstrap")
-depends=("${_target}-gcc" "${_target}-freetype2")
+depends=("${_target}-gcc" "${_target}-freetype2" "${_target}-icu")
 source ./build.sh
