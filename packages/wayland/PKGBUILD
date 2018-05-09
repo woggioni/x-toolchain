@@ -1,0 +1,39 @@
+# $Id$
+# Maintainer: Tom Gundersen <teg@jklm.no>
+# Maintainer: Sébastien Luttringer <seblu@archlinux.org>
+# Contributor: Joel Teichroeb <joel@teichroeb.net>
+
+pkgname="${_target}-wayland"
+_basename="${pkgname#${_target}-}"
+pkgver=1.14.0
+pkgrel=1
+pkgdesc='A computer display server protocol'
+arch=('x86_64')
+url='https://wayland.freedesktop.org/'
+license=('MIT')
+options=('staticlibs' '!strip' '!buildflags')
+depends=("${_target}-configure" "${_target}-gcc" "${_target}-libffi" "${_target}-expat" "${_target}-libxml2")
+validpgpkeys=('C7223EBE4EF66513B892598911A30156E0E67611') # Bryce Harrington
+source=("https://wayland.freedesktop.org/releases/$_basename-$pkgver.tar.xz"{,.sig})
+sha1sums=('53a443be3bafe73209bbc49ef2cb134ed16e0141'
+          'SKIP')
+
+build() {
+  cd $_basename-$pkgver
+
+  ${_target}-configure \
+    --with-host-scanner \
+    --disable-documentation \
+    .
+  make
+}
+
+package() {
+  cd $_basename-$pkgver
+
+  make DESTDIR="$pkgdir" install
+  install -Dm 644 COPYING "$pkgdir/${_prefix}/${_target}/sysroot/share/licenses/$_basename/COPYING"
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}
+
+# vim:set ts=2 sw=2 et:

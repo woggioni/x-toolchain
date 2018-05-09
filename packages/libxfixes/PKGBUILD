@@ -1,0 +1,35 @@
+# $Id$
+# Maintainer: Andreas Radke <andyrtr@archlinux.org>
+# Maintainer: Jan de Groot <jgc@archlinux.org>
+
+pkgname="${_target}-libxfixes"
+_basename="${pkgname#${_target}-}"
+pkgver=5.0.3
+pkgrel=2
+pkgdesc="X11 miscellaneous 'fixes' extension library"
+arch=('x86_64')
+url="https://xorg.freedesktop.org/"
+license=('custom')
+options=('staticlibs' '!strip' '!buildflags')
+depends=("${_target}-libx11" "${_target}-fixesproto")
+makedepends=("${_target}-xorg-util-macros")
+source=(${url}/releases/individual/lib/libXfixes-${pkgver}.tar.bz2{,.sig})
+sha256sums=('de1cd33aff226e08cefd0e6759341c2c8e8c9faf8ce9ac6ec38d43e287b22ad6'
+            'SKIP')
+
+validpgpkeys=('C41C985FDCF1E5364576638B687393EE37D128F8') # Matthieu Herrb <matthieu.herrb@laas.fr>
+
+build() {
+  cd "${srcdir}/libXfixes-${pkgver}"
+  ${_target}-configure .
+  make
+}
+
+package() {
+  cd "${srcdir}/libXfixes-${pkgver}"
+  make DESTDIR="${pkgdir}" install
+
+  install -m755 -d "${pkgdir}/${_prefix}/${_target}/sysroot/share/licenses/${_basename}"
+  install -m644 COPYING "${pkgdir}/${_prefix}/${_target}/sysroot/share/licenses/${_basename}/"
+  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+}
