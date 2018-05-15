@@ -68,4 +68,6 @@ package() {
       -e "s|@PREFIX[@]|/${_prefix}/${_target}|g" \
       -e "s|@VERSION[@]|$pkgver|g"
     find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+    rm "$pkgdir/${_prefix}/${_target}/sysroot/lib/charset.alias"
+    rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
 }
