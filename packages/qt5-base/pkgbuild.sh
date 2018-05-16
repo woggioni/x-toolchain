@@ -231,8 +231,6 @@ package() {
   _builddir="${srcdir}/build"
   pushd "${_builddir}"
   make install INSTALL_ROOT="${pkgdir}"
-  # rm -r "${pkgdir}/${_prefix}/${_target}/share"
-  # strip -s "${pkgdir}/${_prefix}/${_target}/bin"/*
   install -d "${pkgdir}/${_prefix}/bin/"
   for tool in "${pkgdir}/${_prefix}/${_target}/bin/"* 
   do
