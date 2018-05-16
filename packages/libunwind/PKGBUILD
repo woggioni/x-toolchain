@@ -29,7 +29,7 @@ prepare () {
 
 build() {
   cd $_basename-$pkgver 
-  LIBS="-lexecinfo"
+  export LIBS="-lexecinfo" 
   ${_target}-configure --enable-cxx-exceptions .
   make
 }
