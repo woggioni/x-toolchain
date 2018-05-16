@@ -1,0 +1,4 @@
+pkgname="${_target}-qt5-base-static"
+conflicts=("${_target}-qt5-base")
+_build_type="static"
+source pkgbuild.sh
