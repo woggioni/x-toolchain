@@ -1,7 +1,7 @@
 # Maintainer: Mike Brown 
 # Maintainer: Kevin Mihelich
 pkgname="${_target}-gcc"
-pkgver="8.1.0"
+pkgver="7.3.0"
 pkgrel=1
 pkgdesc="ARM cross-toolchain based on musl C library"
 arch=('x86_64')
