@@ -1,5 +1,5 @@
 pkgname="${_target}-libunistring"
-pkgver=0.9.7
+pkgver=0.9.10
 pkgrel=1
 pkgdesc="Library for manipulating Unicode strings and C strings. (${_target})"
 arch=(any)
@@ -8,8 +8,10 @@ license=("GPL")
 makedepends=("${_target}-configure")
 depends=("${_target}-gcc")
 options=(staticlibs !strip !buildflags)
-source=("http://ftp.gnu.org/gnu/libunistring/libunistring-${pkgver}.tar.gz")
-md5sums=('8e663454aa372181ee8e46edaa3ba4c8')
+source=(http://ftp.gnu.org/gnu/libunistring/libunistring-${pkgver}.tar.xz{,.sig})
+validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871')
+md5sums=('db08bb384e81968957f997ec9808926e'
+         'SKIP')
 
 build() {
 	cd "${srcdir}/libunistring-${pkgver}"

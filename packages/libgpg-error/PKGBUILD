@@ -4,7 +4,7 @@
 
 pkgname="${_target}-libgpg-error"
 _basename="${pkgname#${_target}-}"
-pkgver=1.29
+pkgver=1.33
 pkgrel=1
 pkgdesc="Support library for libgcrypt"
 arch=(x86_64)
@@ -16,7 +16,7 @@ makedepends=("${_target}-configure")
 source=(ftp://ftp.gnupg.org/gcrypt/libgpg-error/${_basename}-${pkgver}.tar.bz2{,.sig})
 	#ftp://ftp.franken.de/pub/crypt/mirror/ftp.gnupg.org/gcrypt/libgpg-error/${pkgname}-${pkgver}.tar.bz2)
 # https://www.gnupg.org/download/integrity_check.html
-sha1sums=('a56241d60bb7d810fdb478463b1732b134a52a19'
+sha1sums=('bd40bf4cb6a0b725f5ea91b68d6ae5aeb387a750'
           'SKIP')
 validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6'  # Werner Koch
               '031EC2536E580D8EA286A9F22071B08A33BD3F06') # NIIBE Yutaka (GnuPG Release Key) <gniibe@fsij.org>
@@ -25,7 +25,7 @@ build() {
 
   if [[ $_os == linux* ]] && [[ $_cpu == x86_64 ]] && [[ ${_os} == "linux-musl" ]]
   then
-    cp src/syscfg/lock-obj-pub.x86_64-pc-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
+    cp src/syscfg/lock-obj-pub.x86_64-unknown-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
   elif [[ $_os == linux* ]] && [[ $_cpu == arm ]]
   then
     cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h

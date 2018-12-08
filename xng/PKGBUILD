@@ -3,7 +3,7 @@
 
 _reponame="crosstool-ng"
 pkgname="xng"
-pkgver=3.901797a
+pkgver=22.3f04d38
 pkgrel=1
 pkgdesc="Crosstool-NG is a versatile (cross) toolchain generator"
 arch=('any')

@@ -1,5 +1,5 @@
 pkgname="${_target}-libidn2"
-pkgver=2.0.3
+pkgver=2.0.5
 pkgrel=1
 pkgdesc="A free software implementation of IDNA2008 (mingw-w64)"
 arch=(any)
@@ -9,7 +9,7 @@ makedepends=("${_target}-configure")
 depends=("${_target}-gcc" "${_target}-libunistring")
 options=(staticlibs !strip !buildflags)
 source=("https://ftp.gnu.org/pub/gnu/libidn/libidn2-${pkgver}.tar.gz")
-sha1sums=('9264dfafbad5979a9b38d8092e9f3fe6481843ea')
+sha1sums=('91a5122511f87aaaa3f1b700f23c487aaf0dbd9e')
 
 build() {
   cd "${srcdir}/libidn2-${pkgver}"

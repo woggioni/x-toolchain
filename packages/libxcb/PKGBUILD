@@ -12,7 +12,7 @@ arch=('x86_64')
 url="https://xcb.freedesktop.org/"
 options=(staticlibs !strip !buildflags)
 depends=("${_target}-xcb-proto>=1.12" "${_target}-libxdmcp" "${_target}-libxau")
-makedepends=("${_target}-libxslt" "python" "${_target}-xorg-util-macros" "${_target}-configure")
+makedepends=("${_target}-libxslt" "python" "${_target}-xorg-util-macros" "${_target}-configure" "xorg-util-macros")
 license=('custom')
 source=($url/dist/$_basename-$pkgver.tar.bz2{,.sig}
         libxcb-1.1-no-pthread-stubs.patch)

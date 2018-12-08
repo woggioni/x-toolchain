@@ -3,10 +3,10 @@
 # Contributor: Tom Newsom <Jeepster@gmx.co.uk>
 
 pkgname="${_target}-sqlite"
-_srcver=3210000
+_srcver=3260000
 _docver=${_srcver}
 #_docver=3080001
-pkgver=3.21.0
+pkgver=3.26.0
 pkgrel=1
 pkgdesc="A C library that implements an SQL database engine"
 arch=('x86_64')
@@ -14,15 +14,15 @@ license=('custom:Public Domain')
 url="http://www.sqlite.org/"
 depends=("${_target}-gcc" "${_target}-readline")
 makedepends=("${_target}-readline" "${_target}-configure")
-source=("http://www.sqlite.org/2017/sqlite-autoconf-$_srcver.tar.gz")
+source=("http://www.sqlite.org/2018/sqlite-autoconf-${_srcver}.tar.gz" config.sub)
+sha256sums=('5daa6a3fb7d1e8c767cd59c4ded8da6e4b00c61d3b466d0685e35c4dd6d7bf5d' 'SKIP')
 options=('!emptydirs' '!makeflags' 'staticlibs' '!strip' '!buildflags') # json extensions breaks parallel build
-sha1sums=('SKIP')
 
 prepare() {
   pushd "${srcdir}/sqlite-autoconf-${_srcver}"
-  mkdir -p build-${_target} && pushd build-${_target}
-#  autoreconf -vfi
-  popd
+  # cp "${srcdir}/config.sub" .
+  autoreconf -vfi
+  mkdir -p build-${_target}
   popd
 }
 
@@ -38,14 +38,21 @@ build() {
   # build sqlite
   pushd "${srcdir}/sqlite-autoconf-${_srcver}/build-${_target}"
   ${_target}-configure \
-	--enable-fts5 \
-	--enable-json1 .
+    --disable-editline \
+    --enable-readline \
+    --enable-fts3 \
+    --enable-fts4 \
+    --enable-fts5 \
+    --enable-rtree \
+    --enable-json1 \
+    --enable-fts5 \
+    --enable-session \
+    .
   make
   popd
 }
 
 package() {
-
   pkgdesc="A C library that implements an SQL database engine"
   provides=("${_target}-sqlite3=$pkgver")
   replaces=("${_target}-sqlite3")

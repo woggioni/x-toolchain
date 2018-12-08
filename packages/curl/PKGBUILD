@@ -1,7 +1,7 @@
 # Contributor: ant32 <antreimer@gmail.com>
 
 pkgname="${_target}-curl"
-pkgver=7.56.0
+pkgver=7.62.0
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
 arch=('any')
@@ -15,11 +15,22 @@ depends=("${_target}-gcc"
 makedepends=("${_target}-configure")
 options=('staticlibs' '!strip' '!buildflags')
 source=("$url/download/curl-$pkgver.tar.bz2")
-sha256sums=('de60a4725a3d461c70aa571d7d69c788f1816d9d1a8a2ef05f864ce8f01279df')
+sha256sums=('7802c54076500be500b171fde786258579d60547a3a35b8c5a23d8c88e8f9620')
 
 build() {
   cd "${srcdir}"/${pkgname#${_target}-}-${pkgver}
-    configure_args="--with-ssl --enable-ipv6 --with-libidn2 --with-libssh2 --without-ca-bundle --without-random"
+    configure_args="--with-ssl \
+                    --disable-ldap \
+                    --disable-ldaps \
+                    --disable-manual \
+                    --enable-ipv6 \
+                    --enable-threaded-resolver \
+                    --with-libidn2 \
+                    --with-libssh2 \
+                    --enable-versioned-symbols \
+                    --with-gssapi \
+                    --without-ca-bundle \
+                    --without-random"
     mkdir -p build-${_target}-static && pushd build-${_target}-static
     ${_target}-configure $configure_args \
       --enable-static --disable-shared ..

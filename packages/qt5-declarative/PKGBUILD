@@ -4,7 +4,7 @@
 
 pkgname="${_target}-qt5-declarative"
 _basename="${pkgname#${_target}-}"
-_qtver=5.10.0
+_qtver=5.12.0
 pkgver=${_qtver/-/}
 pkgrel=3
 arch=('x86_64')
@@ -19,12 +19,8 @@ conflicts=("${_target}-qtchooser" "${_target}-qt5-declarative-render2d")
 replaces=("${_target}-qt5-declarative-render2d")
 _pkgfqn="${_basename/5-/}-everywhere-src-${_qtver}"
 #_pkgfqn="qtbase-everywhere-src-${pkgver}"
-source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz"
-        qtbug-65789-2.patch::"https://github.com/qt/qtdeclarative/commit/602a6589.patch"
-        qtbug-67019.patch::"https://github.com/qt/qtdeclarative/commit/b1243b8c.patch")
-sha256sums=('5ccb4dbca5046554037bcffbb05918f6efcff321c44cd1c39b1c47be7e67711e'
-            'e516e969dcf9520a4e5f05291ffe4baef1a6e499248f342f66c39147ef06a272'
-            'eed0e2617d4d46452acc79438666bab46c0c797ec4cb9ab447037c4176d83aba')
+source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz")
+sha256sums=('4ffd58102b5714ae058f91cc31511f1c928978f77f01652beb9ce2352a4c227b')
 
 prepare() {
   mkdir -p build

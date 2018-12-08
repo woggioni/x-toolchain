@@ -4,7 +4,7 @@
 
 pkgname="${_target}-qt5-xmlpatterns"
 _basename="${pkgname#${_target}-}"
-_qtver=5.10.0
+_qtver=5.12.0
 pkgver=${_qtver/-/}
 pkgrel=1
 arch=('x86_64')
@@ -18,7 +18,7 @@ conflicts=("${_target}-qtchooser")
 groups=("${_target}-qt" "${_target}-qt5")
 _pkgfqn="${_basename/5-/}-everywhere-src-${_qtver}"
 source=("http://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz")
-sha256sums=('b08abca6227e942a128e478b2eb81416c40925418d89064ee151c155e3d203c3')
+sha256sums=('f36279bcafb8052a0b60edd473e1d341b4733a43eb26239848b4382303679375')
 
 prepare() {
   mkdir -p build

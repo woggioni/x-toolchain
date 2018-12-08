@@ -4,9 +4,9 @@
 # Contributor: Travis Willard <travis@archlinux.org>
 # Contributor: Douglas Soares de Andrade <douglas@archlinux.org>
 pkgname="${_target}-libpng"
-pkgver=1.6.34
+pkgver=1.6.36
 _basename="${pkgname#${_target}-}"
-_apngver=1.6.34
+_apngver=${pkgver}
 pkgrel=2
 pkgdesc="A collection of routines used to create PNG format graphics files"
 arch=('x86_64')
@@ -16,11 +16,10 @@ depends=("${_target}-gcc" "${_target}-zlib" 'sh')
 makedepends=("${_target}-configure")
 options=('staticlibs' '!strip' '!buildflags')
 validpgpkeys=('8048643BA2C840F4F92A195FF54984BFA16C640F') # Glenn Randers-Pehrson (mozilla) <glennrp@gmail.com>
-source=("https://downloads.sourceforge.net/sourceforge/$_basename/$_basename-$pkgver.tar.xz"{,.asc}
+source=("https://netix.dl.sourceforge.net/project/$_basename/libpng16/$pkgver/$_basename-$pkgver.tar.xz"
         "https://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz")
-sha256sums=('2f1e960d92ce3b3abd03d06dfec9637dfbd22febf107a536b44f7a47c60659f6'
-            'SKIP'
-            'e661944e54574a3f26927ac9eb7e2788f3a2675545a19735b83fbb9adcb544c1')
+sha256sums=('eceb924c1fa6b79172fdfd008d335f0e59172a86a66481e09d4089df872aa319'
+            '8c1f33da739b29a77e35e5a1ebcdffaab63bfe184be8b5a97677cc80156fdc0f')
 
 prepare() {
   cd "${_basename}-$pkgver"

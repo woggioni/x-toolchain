@@ -3,7 +3,7 @@
 pkgbase="${_target}-harfbuzz"
 _basename=${pkgbase#${_target}-}
 
-pkgver=1.7.4
+pkgver=2.2.0
 pkgrel=1
 pkgdesc="OpenType text shaping engine"
 url="http://www.freedesktop.org/wiki/Software/HarfBuzz"
@@ -11,7 +11,7 @@ arch=(x86_64)
 license=(MIT)
 options=('staticlibs' '!strip' '!buildflags')
 makedepends=(git python "${_target}-configure")
-_commit=007a2a4317227b8fb4c764c590203c85fc3da5fd  # tags/1.7.4^0
+_commit=dc41ecef85b094b30c612113606597b91c55351c  # tags/1.7.4^0
 source=("git+https://anongit.freedesktop.org/git/harfbuzz#commit=$_commit")
 sha256sums=('SKIP')
 

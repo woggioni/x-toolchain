@@ -3,7 +3,7 @@
 
 pkgname="${_target}-openssl"
 _basename="${pkgname#${_target}-}"
-_ver=1.1.0h
+_ver=1.1.1a
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
 #pkgver=$_ver
@@ -20,15 +20,14 @@ backup=("./${_prefix}/${_target}/sysroot/etc/ssl/openssl.cnf")
 source=("https://www.openssl.org/source/${_basename}-${_ver}.tar.gz"
         "https://www.openssl.org/source/${_basename}-${_ver}.tar.gz.asc"
         'ca-dir.patch')
-sha256sums=('5835626cde9e99656585fc7aaa2302a73a7e1340bf8c14fd635a62c66802a517'
+sha256sums=('fc20130f8b7cbd2fb918b2f14e2f429e109c31ddd0fb38fc5d71d9ffed3f9f41'
             'SKIP'
-            '90c7411fed0157116f2df8f4be755aaf5a26e8484351b4e6a79492805d5f2790')
+            '0938c8d68110768db4f350a7ec641070686904f2fe7ba630ac94399d7dc8cc5e')
 validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491')
 
 
 prepare() {
 	cd "$srcdir/$_basename-$_ver"
-
 	# set ca dir to /etc/ssl by default
 	patch -p0 -i "$srcdir/ca-dir.patch"
 }
@@ -51,7 +50,7 @@ build() {
                 --cross-compile-prefix=${_target}- \
                 --openssldir=/etc/ssl \
                 --libdir=lib \
-		            shared no-ssl3-method no-async zlib-dynamic ${_optflags} \
+		            shared no-ssl3-method zlib-dynamic ${_optflags} \
 		            "${_platform}" \
 		            "-Wa,--noexecstack ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
     make
@@ -59,9 +58,8 @@ build() {
 
 package() {
     cd "${srcdir}/build-${_target}"
-    make -j1 DESTDIR="${pkgdir}" install_sw
+    make DESTDIR="${pkgdir}" MANDIR="${_prefix}/${_target}/sysroot/usr/share/man" MANSUFFIX=ssl install_sw
     install -d "$pkgdir/${_prefix}/${_target}/sysroot/usr/"
     mv "$pkgdir/${_prefix}/${_target}/sysroot/include" "$pkgdir/${_prefix}/${_target}/sysroot/usr/"
-    #install -m644 ms/applink.c "${pkgdir}${_prefix}/${target}/include/openssl/"
     find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }

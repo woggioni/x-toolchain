@@ -4,7 +4,7 @@
 # Contributor: Travis Willard <travis@archlinux.org>
 # Contributor: Douglas Soares de Andrade <douglas@archlinux.org>
 
-pkgver=5.10.0
+pkgver=5.12.0
 _basename="${pkgname#${_target}-}"
 pkgrel=1
 pkgdesc="A collection of routines used to create PNG format graphics files"
@@ -131,7 +131,7 @@ _patches2apply=(
     # '0008-Fix-linking-against-shared-static-libpng.patch'
     # '0009-Fix-linking-against-static-D-Bus.patch'
     # '0010-Don-t-try-to-use-debug-version-of-D-Bus-library.patch'
-    '0011-Fix-linking-against-static-freetype2.patch'
+    # '0011-Fix-linking-against-static-freetype2.patch'
     # '0012-Fix-linking-against-static-harfbuzz.patch'
     # '0013-Fix-linking-against-static-pcre.patch'
     # '0014-Fix-linking-against-shared-static-MariaDB.patch'
@@ -191,16 +191,18 @@ build() {
       -no-glib \
       -no-dbus \
       -icu \
+      -no-rpath \
       -no-iconv \
       -no-fontconfig \
       -release \
+      -no-use-gold-linker \
       -confirm-license \
       -force-pkg-config \
       -system-zlib \
       -system-libpng \
       -system-libjpeg \
       -system-sqlite \
-      -openssl-runtime \
+      -openssl-linked \
       -system-freetype \
       -system-harfbuzz \
       -system-pcre \
@@ -238,7 +240,8 @@ package() {
     then
       strip -s "${tool}"
     fi
-    ln -s "/${tool}" "${pkgdir}/${_prefix}/bin/${_target}-$(basename ${tool})"
+    local toolname=$(basename ${tool})
+    ln -s "${_prefix}/${_target}/bin/${toolname}" "${pkgdir}/${_prefix}/bin/${_target}-${toolname}"
   done
   find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -name '*.a' -name '*.so*' -type f -exec ${_arch}-strip -g {} \;
   find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -name '*.prl' -type f -exec \
