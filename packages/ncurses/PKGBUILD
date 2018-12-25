@@ -10,20 +10,65 @@ pkgdesc='System V Release 4.0 curses emulation library'
 arch=(x86_64)
 url='http://invisible-island.net/ncurses/ncurses.html'
 license=(MIT)
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-gcc")
 makedepends=("${_target}-configure")
-source=(https://ftp.gnu.org/pub/gnu/ncurses/ncurses-$pkgver.tar.gz{,.sig})
-md5sums=('e812da327b1c2214ac1aed440ea3ae8d'
-         'SKIP')
+source=(https://ftp.gnu.org/pub/gnu/ncurses/ncurses-$pkgver.tar.gz{,.sig}
+        001-use-libsystre.patch)
+md5sums=('98c889aaf8d23910d2b92d65be2e737a'
+         'SKIP'
+         'b669861903d0699b6535b7c6e028880d')
 validpgpkeys=('C52048C0C0748FEE227D47A2702353E0F7E48EDB')  # Thomas Dickey
+
+
+prepare() {
+  if [[ ${_os} == mingw32* ]]
+  then
+      cd ${pkgname##${_target}-}-${_pkgver}
+      patch -Np1 -i "${srcdir}/001-use-libsystre.patch"
+  fi
+}
 
 build() {
   cd ${pkgname##${_target}-}-${_pkgver}
-  ${_target}-configure --with-pkg-config-libdir="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
-    --with-shared --with-normal --without-debug --without-ada --without-tests --disable-termcap --disable-rpath-hack \
-    --disable-stripping --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared --includedir="${_prefix}/${_target}/sysroot/usr/include" \
-    .
+
+  if [[ ${_os} == mingw32* ]]
+  then
+      ${_target}-configure \
+        --with-pkg-config-libdir="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
+        --without-ada \
+        --with-cxx \
+        --without-shared \
+        --without-pthread \
+        --enable-pc-files \
+        --disable-rpath \
+        --enable-colorfgbg \
+        --enable-ext-colors \
+        --enable-ext-mouse \
+        --disable-symlinks \
+        --enable-warnings \
+        --enable-assertions \
+        --disable-home-terminfo \
+        --enable-database \
+        --enable-sp-funcs \
+        --enable-term-driver \
+        --enable-interop \
+        --enable-widec .
+  else
+    ${_target}-configure \
+        --with-pkg-config-libdir="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
+        --with-shared \
+        --with-normal \
+        --without-debug \
+        --without-ada \
+        --disable-stripping \
+        --enable-widec \
+        --enable-pc-files \
+        --with-cxx-binding \
+        --with-cxx-shared \
+        --with-termlib=tinfo \
+        --with-ticlib=tic .
+  fi
   make
 }
 
@@ -31,8 +76,6 @@ package() {
   cd ${pkgname##${_target}-}-${_pkgver}
   make DESTDIR="$pkgdir" install
   #rm "${pkgdir}${_prefix}/${_target}/lib/terminfo"
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
-  ${_target}-strip "$pkgdir/${_prefix}/${_target}/sysroot/bin/${_target}-"*
   # fool packages looking to link to non-wide-character ncurses libraries
   for lib in ncurses ncurses++ form panel menu; do
     echo "INPUT(-l${lib}w)" > "${pkgdir}/${_prefix}/${_target}/sysroot/lib/lib${lib}.so"
@@ -47,3 +90,8 @@ package() {
   echo "INPUT(-lncursesw)" > "${pkgdir}/${_prefix}/${_target}/sysroot/lib/libcursesw.so"
   ln -s libncurses.so "${pkgdir}/${_prefix}/${_target}/sysroot/lib/libcurses.so"
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip
