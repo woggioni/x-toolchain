@@ -10,7 +10,7 @@ arch=('any')
 makedepends=('git' 'help2man')
 license=('custom')
 url="http://crosstool-ng.github.io/"
-source=("git+https://github.com/crosstool-ng/crosstool-ng")
+source=("git+https://github.com/oggio88/crosstool-ng.git")
 md5sums=('SKIP')
 pkgver() {
   cd "${_pkgname}"

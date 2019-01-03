@@ -7,15 +7,25 @@ depends=('cmake' "${_target}-pkg-config")
 license=("GPL")
 url="http://fedoraproject.org/wiki/MinGW"
 source=("x-cmake.sh"
-        "x-toolchain.cmake")
-md5sums=('SKIP' 'SKIP')
+        "x-toolchain.cmake"
+        "mingw_additional_params.cmake")
+md5sums=('SKIP' 'SKIP' 'SKIP')
 
 build() {
+    local toolchain_files
     if [[ ${_os} == linux* ]]
     then 
         _os="Linux"
+        toolchain_files=('x-toolchain.cmake')
+    elif [[ ${_os} == mingw* ]]
+    then
+        _os="Windows"
+        toolchain_files=('x-toolchain.cmake' 'mingw_additional_params.cmake')
     fi
-    sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" -e "s|@CPU@|${_cpu}|g" -e "s|@OS@|${_os}|g" x-toolchain.cmake > toolchain-${_target}.cmake
+    for toolchain_file in ${toolchain_files[@]}
+    do
+        sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" -e "s|@CPU@|${_cpu}|g" -e "s|@OS@|${_os}|g" "$toolchain_file" >> toolchain-${_target}.cmake
+    done
     sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" x-cmake.sh > ${_target}-cmake
 }
 

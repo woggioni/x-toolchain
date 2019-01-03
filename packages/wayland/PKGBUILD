@@ -11,7 +11,7 @@ pkgdesc='A computer display server protocol'
 arch=('x86_64')
 url='https://wayland.freedesktop.org/'
 license=('MIT')
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 depends=("${_target}-configure" "${_target}-gcc" "${_target}-libffi" "${_target}-expat" "${_target}-libxml2")
 makedepends=("${_target}-meson" "meson" 'ninja' "${_target}-libxslt" 'xmlto' 'graphviz' 'docbook-xsl')
 
@@ -36,7 +36,9 @@ package() {
 
   make DESTDIR="$pkgdir" install
   install -Dm 644 COPYING "$pkgdir/${_prefix}/${_target}/sysroot/share/licenses/$_basename/COPYING"
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
 
-# vim:set ts=2 sw=2 et:
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

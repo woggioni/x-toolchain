@@ -11,7 +11,7 @@ pkgdesc='Portable foreign function interface library'
 arch=('x86_64')
 url='http://sourceware.org/libffi/'
 license=('MIT')
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-gcc")
 makedepends=("${_target}-configure")
 source=(ftp://sourceware.org/pub/libffi/libffi-$pkgver.tar.gz)
@@ -27,6 +27,10 @@ package() {
   cd $_basename-$pkgver
   make DESTDIR="$pkgdir" install
   install -Dm644 LICENSE "$pkgdir"${_prefix}/${_target}/sysroot/share/licenses/$pkgname/LICENSE
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
   rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

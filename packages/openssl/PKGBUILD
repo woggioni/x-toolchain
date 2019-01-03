@@ -12,11 +12,11 @@ pkgdesc='The Open Source toolkit for Secure Sockets Layer and Transport Layer Se
 arch=('x86_64')
 url='https://www.openssl.org'
 license=('custom:BSD')
-options=(!strip !buildflags staticlibs)
+options=(!buildflags staticlibs)
 depends=('perl' "${_target}-zlib" "${_target}-gcc")
 makedepends=("${_target}-configure")
 optdepends=("${_target}-ca-certificates")
-backup=("./${_prefix}/${_target}/sysroot/etc/ssl/openssl.cnf")
+backup=("${_prefix:1}/${_target}/sysroot/etc/ssl/openssl.cnf")
 source=("https://www.openssl.org/source/${_basename}-${_ver}.tar.gz"
         "https://www.openssl.org/source/${_basename}-${_ver}.tar.gz.asc"
         'ca-dir.patch')
@@ -36,13 +36,29 @@ prepare() {
 
 build() {
 
-  if [ ${_cpu} == "x86_64" ]; then
-    local _platform="linux-x86_64"
-    local _optflags='enable-ec_nistp_64_gcc_128'
-  elif [ ${_cpu} == "arm" ]; then
-    local _platform="linux-generic32"
-  else
-    local _platform="linux-generic32"
+  if [[ ${_os} == linux* ]]; then
+    local _additional_gcc_flags="-Wa,--noexecstack" 
+    if [ ${_cpu} == "x86_64"]; then
+      local _platform="linux-x86_64"
+      local _optflags='enable-ec_nistp_64_gcc_128'
+    elif [ ${_cpu} == "arm" ]; then
+      local _platform="linux-generic32"
+    else
+      local _platform="linux-generic32"
+    fi
+  elif [[ ${_os} == mingw* ]]; then
+    if [[ ${_cpu} == x86_64 ]]
+    then
+        local _platform="mingw64"
+    elif [[ ${_cpu} == i686 ]]
+    then
+        local _platform="mingw"
+    else
+        echo "Unsupported cpu for Windows build: ${_cpu}"
+        exit 1
+    fi
+    local _optflags="-DOPENSSL_NO_CAPIENG"
+    export CFLAGS="-pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
   fi
   cd "${srcdir}/openssl-$_ver"
     mkdir -p "${srcdir}/build-${_target}" && cp -a "${srcdir}/openssl-$_ver/"* "${srcdir}/build-${_target}" && cd "${srcdir}/build-${_target}"
@@ -52,15 +68,16 @@ build() {
                 --openssldir=/etc/ssl \
                 --libdir=lib \
 		            shared no-ssl3-method zlib-dynamic ${_optflags} \
-		            "${_platform}" \
-		            "-Wa,--noexecstack ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}"
+		            ${_platform} ${_additional_gcc_flags} ${CPPFLAGS} ${CFLAGS} ${LDFLAGS}
     make
 }
 
 package() {
     cd "${srcdir}/build-${_target}"
     make DESTDIR="${pkgdir}" MANDIR="${_prefix}/${_target}/sysroot/usr/share/man" MANSUFFIX=ssl install_sw
-    install -d "$pkgdir/${_prefix}/${_target}/sysroot/usr/"
-    mv "$pkgdir/${_prefix}/${_target}/sysroot/include" "$pkgdir/${_prefix}/${_target}/sysroot/usr/"
-    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

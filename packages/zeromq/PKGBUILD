@@ -10,7 +10,7 @@ url="http://www.zeromq.org"
 license=('LGPL')
 depends=("${_target}-gcc" "${_target}-libsodium")
 makedepends=('asciidoc' 'xmlto' "${_target}-configure")
-options=(!strip !buildflags staticlibs)
+options=(!buildflags staticlibs)
 # "http://download.zeromq.org/$pkgname-$pkgver.tar.gz"
 source=("https://github.com/zeromq/libzmq/releases/download/v$pkgver/zeromq-$pkgver.tar.gz"
         "zmq.hpp.$pkgver::https://raw.githubusercontent.com/zeromq/cppzmq/b0e6d4b/zmq.hpp")
@@ -36,6 +36,9 @@ package() {
   make DESTDIR="$pkgdir" install
   install -Dm644 "$srcdir/zmq.hpp" "$pkgdir/${_prefix}/${_target}/sysroot/usr/include/zmq.hpp"
   popd
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
 
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

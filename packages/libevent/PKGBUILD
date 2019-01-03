@@ -8,7 +8,7 @@ url="http://www.monkey.org/~provos/libevent"
 license=("BSD")
 makedepends=(${_target}-configure)
 depends=("${_target}-gcc" "${_target}-openssl")
-options=(!libtool !strip !buildflags staticlibs)
+options=(!libtool !buildflags staticlibs)
 source=("https://github.com/libevent/libevent/releases/download/release-${pkgver}-stable/libevent-${pkgver}-stable.tar.gz"{,.asc})
 
 sha256sums=('a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d'
@@ -27,5 +27,9 @@ build() {
 package() {
     cd "${srcdir}/${pkgname}-${pkgver}-build-${_target}"
     make DESTDIR="$pkgdir" install
-    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

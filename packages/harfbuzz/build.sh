@@ -9,7 +9,7 @@ pkgdesc="OpenType text shaping engine"
 url="http://www.freedesktop.org/wiki/Software/HarfBuzz"
 arch=(x86_64)
 license=(MIT)
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 makedepends=(git python "${_target}-configure")
 _commit=dc41ecef85b094b30c612113606597b91c55351c  # tags/1.7.4^0
 source=("git+https://anongit.freedesktop.org/git/harfbuzz#commit=$_commit")
@@ -43,7 +43,10 @@ package() {
   cd $_basename
   pushd build-${_target}
   make DESTDIR="$pkgdir" install
-
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_arch}-strip -g {} \;
   popd
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

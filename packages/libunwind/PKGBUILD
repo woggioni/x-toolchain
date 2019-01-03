@@ -37,7 +37,7 @@ build() {
 package() {
   cd $_basename-$pkgver
   make DESTDIR="$pkgdir" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+  find "$pkgdir/${_prefix}/${_target}" -type f \( -name '*.a' -o -name '*.so.?*' -o -name '*.dll' \) -exec ${_target}-strip -g {} \;
 }
 
 # vim:set ts=2 sw=2 et:

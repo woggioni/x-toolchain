@@ -10,7 +10,7 @@ pkgrel=1
 pkgdesc="X11 client-side library"
 arch=('x86_64')
 url="https://xcb.freedesktop.org/"
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-xcb-proto>=1.12" "${_target}-libxdmcp" "${_target}-libxau")
 makedepends=("${_target}-libxslt" "python" "${_target}-xorg-util-macros" "${_target}-configure" "xorg-util-macros")
 license=('custom')
@@ -38,5 +38,9 @@ build() {
 package() {
   cd "$_basename-$pkgver"
   make DESTDIR="$pkgdir" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

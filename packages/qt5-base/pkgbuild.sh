@@ -179,7 +179,7 @@ build() {
   unset PKG_CONFIG_PATH
   mkdir -p "${_builddir}"
   pushd "${_builddir}"
-  _additional_includes="-I${_prefix}/${_target}/sysroot/usr/include/freetype2 -I${_prefix}/${_target}/sysroot/usr/include/harfbuxx"
+  _additional_includes="-I${_prefix}/${_target}/sysroot/include/freetype2 -I${_prefix}/${_target}/sysroot/include/harfbuxx"
   # export PKG_CONFIG_SYSROOT_DIR="/"
   export PKG_CONFIG_LIBDIR="${_prefix}/${_target}/sysroot/lib/pkgconfig"
   "${srcdir}/${_pkgfqn}/configure" \
@@ -217,7 +217,7 @@ build() {
       -datadir ${_prefix}/${_target}/sysroot/share/qt \
       -docdir ${_prefix}/${_target}/sysroot/share/doc/qt \
       -examplesdir ${_prefix}/${_target}/sysroot/share/qt/examples \
-      -headerdir ${_prefix}/${_target}/sysroot/usr/include/qt \
+      -headerdir ${_prefix}/${_target}/sysroot/include/qt \
       -libdir ${_prefix}/${_target}/sysroot/lib \
       -plugindir ${_prefix}/${_target}/sysroot/lib/qt/plugins \
       -sysconfdir ${_prefix}/${_target}/sysroot/etc \
@@ -243,7 +243,7 @@ package() {
     local toolname=$(basename ${tool})
     ln -s "${_prefix}/${_target}/bin/${toolname}" "${pkgdir}/${_prefix}/bin/${_target}-${toolname}"
   done
-  find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -name '*.a' -name '*.so*' -type f -exec ${_arch}-strip -g {} \;
+  find "$pkgdir/${_prefix}/${_target}" -type f \( -name '*.a' -o -name '*.so' -o -name '*.dll' \) -exec ${_target}-strip -g {} \;
   find "$pkgdir/${_prefix}/${_target}/sysroot/lib" -name '*.prl' -type f -exec \
           sed -i -e "s/-lharfbuzz;/-lharfbuzz;-lfreetype;-lharfbuzz;-liconv;-lbz2;/g" \
                  -e "s/-lharfbuzz /-lharfbuzz -lfreetype -lharfbuzz -liconv -lbz2 /g" {} \;

@@ -9,7 +9,7 @@ pkgdesc="GNU internationalization library (${_target})"
 #conflicts=("${_target}-termcap" "${_target}-libunistring")
 depends=("${_target}-libunistring")
 makedepends=('gettext' "${_target}-configure")
-options=(!strip !buildflags staticlibs)
+options=(!buildflags staticlibs)
 license=("GPL")
 url="http://www.gnu.org/software/gettext/"
 source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-${pkgver}.tar.gz"{,.sig}
@@ -67,7 +67,11 @@ package() {
     sed -i "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig/intl.pc" \
       -e "s|@PREFIX[@]|/${_prefix}/${_target}|g" \
       -e "s|@VERSION[@]|$pkgver|g"
-    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
     rm "$pkgdir/${_prefix}/${_target}/sysroot/lib/charset.alias"
     rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

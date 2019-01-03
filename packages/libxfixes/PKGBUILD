@@ -10,7 +10,7 @@ pkgdesc="X11 miscellaneous 'fixes' extension library"
 arch=('x86_64')
 url="https://xorg.freedesktop.org/"
 license=('custom')
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 depends=("${_target}-libx11" "${_target}-fixesproto")
 makedepends=("${_target}-xorg-util-macros")
 source=(${url}/releases/individual/lib/libXfixes-${pkgver}.tar.bz2{,.sig})
@@ -31,5 +31,9 @@ package() {
 
   install -m755 -d "${pkgdir}/${_prefix}/${_target}/sysroot/share/licenses/${_basename}"
   install -m644 COPYING "${pkgdir}/${_prefix}/${_target}/sysroot/share/licenses/${_basename}/"
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

@@ -9,7 +9,7 @@ pkgrel=1
 pkgdesc="X11 miscellaneous extensions library"
 arch=('x86_64')
 url="https://xorg.freedesktop.org/"
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 license=('custom')
 depends=("${_target}-libx11" "${_target}-xextproto")
 makedepends=("${_target}-xorg-util-macros" "${_target}-configure")
@@ -27,5 +27,9 @@ build() {
 package() {
   cd libXext-${pkgver}
   make DESTDIR="${pkgdir}" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

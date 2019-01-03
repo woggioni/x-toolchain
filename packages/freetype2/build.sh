@@ -8,7 +8,7 @@ pkgdesc="Font rasterization library"
 arch=(x86_64)
 license=('GPL')
 url="https://www.freetype.org/"
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 # adding harfbuzz for improved OpenType features auto-hinting
 # introduces a cycle dep to harfbuzz depending on freetype wanted by upstream
 depends=("${_target}-gcc"
@@ -16,7 +16,7 @@ depends=("${_target}-gcc"
          "${_target}-bzip2"
          "${_target}-libpng" "sh")
 makedepends=("libx11" "${_target}-configure")
-source=(https://download-mirror.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2{,.sig}
+source=(http://download-mirror.savannah.gnu.org/releases/freetype/freetype-${pkgver}.tar.bz2{,.sig}
         0001-Enable-table-validation-modules.patch
         0002-Enable-infinality-subpixel-hinting.patch
         0003-Enable-long-PCF-family-names.patch)
@@ -62,7 +62,10 @@ package() {
   cd freetype2
   pushd build-${_target}
   make DESTDIR="${pkgdir}" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_arch}-strip -g {} \;
   popd
 }
-# vim:set ts=2 sw=2 et:
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

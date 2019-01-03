@@ -7,7 +7,7 @@ exec meson setup \
   --libexecdir     @PREFIX@/@TRIPLE@/sysroot/lib \
   --bindir         @PREFIX@/@TRIPLE@/sysroot/bin \
   --sbindir        @PREFIX@/bin \
-  --includedir     @PREFIX@/@TRIPLE@/sysroot/usr/include \
+  --includedir     @PREFIX@/@TRIPLE@/sysroot/include \
   --datadir        @PREFIX@/@TRIPLE@/sysroot/share \
   --mandir         @PREFIX@/@TRIPLE@/sysroot/share/man \
   --infodir        @PREFIX@/@TRIPLE@/sysroot/share/info \

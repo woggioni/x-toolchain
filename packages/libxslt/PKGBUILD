@@ -10,7 +10,7 @@ pkgdesc="XML stylesheet transformation library"
 url="http://xmlsoft.org/XSLT/"
 arch=(x86_64)
 license=(custom)
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-libxml2" "${_target}-libgcrypt")
 makedepends=(git "${_target}-configure")
 checkdepends=(docbook-xml)
@@ -49,5 +49,9 @@ package() {
   cd $_basename
   make DESTDIR="$pkgdir" install
   find "$pkgdir" -name '*.a' -print -delete
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

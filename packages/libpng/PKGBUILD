@@ -14,7 +14,7 @@ url="http://www.libpng.org/pub/png/libpng.html"
 license=('custom')
 depends=("${_target}-gcc" "${_target}-zlib" 'sh')
 makedepends=("${_target}-configure")
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 validpgpkeys=('8048643BA2C840F4F92A195FF54984BFA16C640F') # Glenn Randers-Pehrson (mozilla) <glennrp@gmail.com>
 source=("https://netix.dl.sourceforge.net/project/$_basename/libpng16/$pkgver/$_basename-$pkgver.tar.xz"
         "https://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz")
@@ -40,5 +40,9 @@ build() {
 package() {
   cd "${_basename}-$pkgver/build-${_target}"
   make DESTDIR="$pkgdir" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

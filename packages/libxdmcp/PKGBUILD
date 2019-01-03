@@ -10,7 +10,7 @@ pkgdesc="X11 Display Manager Control Protocol library"
 arch=('x86_64')
 url="https://xorg.freedesktop.org/"
 license=('custom')
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-xproto" "${_target}-gcc")
 makedepends=("${_target}-xorg-util-macros" "${_target}-configure")
 source=(${url}/releases/individual/lib/libXdmcp-${pkgver}.tar.bz2{,.sig})
@@ -27,5 +27,9 @@ build() {
 package() {
   cd libXdmcp-${pkgver}
   make DESTDIR="${pkgdir}" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

@@ -14,7 +14,7 @@ depends=("${_target}-gcc")
 makedepends=("${_target}-configure")
 source=(https://xorg.freedesktop.org/releases/individual/lib/${_basename}-${pkgver}.tar.xz)
 sha512sums=('8a60edb113d68791b41bd90b761ff7b3934260cb3dada3234c9351416f61394e4157353bc4d61b8f6c2c619de470f6feefffb4935bfcf79d291ece6285de7270')
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 
 prepare() {
   cd $_basename-$pkgver
@@ -45,3 +45,8 @@ package() {
   DESTDIR="${pkgdir}" meson install -C build
   find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

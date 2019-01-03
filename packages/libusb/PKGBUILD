@@ -1,0 +1,35 @@
+# Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
+# Contributor: Tobias Powalowski <tpowa@archlinux.org>
+
+pkgname="${_target}-libusb"
+_basename="${pkgname#${_target}-}"
+pkgver=1.0.22
+pkgrel=1
+pkgdesc='Library that provides generic access to USB devices'
+arch=(x86_64)
+url='http://libusb.info/'
+license=(LGPL)
+depends=("${_target}-gcc")
+options=('staticlibs' '!buildflags')
+replaces=("${_target}-libusb1" "${_target}-libusbx")
+provides=("${_target}-libusbx=$pkgver" "${_target}-libusb-1.0.so")
+conflicts=("${_target}-libusbx")
+source=(https://github.com/libusb/libusb/releases/download/v$pkgver/libusb-$pkgver.tar.bz2)
+md5sums=('466267889daead47674df933cea9cacb')
+
+build() {
+  cd $_basename-$pkgver
+  ${_target}-configure \
+    --disable-udev \
+  .
+  make
+}
+
+package () {
+  make -C $_basename-$pkgver DESTDIR="$pkgdir" install
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

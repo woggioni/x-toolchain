@@ -9,7 +9,7 @@ pkgdesc="combined X.Org X11 Protocol headers"
 arch=('any')
 url="https://xorg.freedesktop.org/"
 license=('custom')
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 makedepends=("${_target}-xorg-util-macros" "${_target}-meson") # 'xmlto' 'libxslt' 'linuxdoc-tools' 'docbook-sgml' 'fop')
 provides=("${_target}-bigreqsproto" 
           "${_target}-compositeproto" 
@@ -62,5 +62,9 @@ package() {
   # cleanup
   install -d "${pkgdir}${_prefix}/${_target}/sysroot/lib/"
   mv "${pkgdir}${_prefix}/${_target}/sysroot/share/pkgconfig" "${pkgdir}${_prefix}/${_target}/sysroot/lib/"
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

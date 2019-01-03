@@ -39,5 +39,5 @@ package() {
     make install prefix="${pkgdir}/${_prefix}/${_target}/sysroot" exec_prefix="${pkgdir}/${_prefix}/${_target}/sysroot" oldincludedir=
     install -m 0644 ${srcdir}/lib${_basename}.so "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
     ln -s ${_prefix}/${_target}/sysroot/lib/lib${_basename}.so ${pkgdir}/${_prefix}/${_target}/sysroot/lib/lib${_basename}.so.${pkgver}  
-    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+    find "$pkgdir/${_prefix}/${_target}" -type f \( -name '*.a' -o -name '*.so.?*' -o -name '*.dll' \) -exec ${_target}-strip -g {} \;
 }

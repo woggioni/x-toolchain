@@ -12,7 +12,7 @@ pkgrel=1
 pkgdesc='The GNU Bourne Again shell'
 arch=(x86_64)
 license=(GPL)
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 url='http://www.gnu.org/software/bash/bash.html'
 groups=(base)
 backup=("./${_prefix}/${_target}/sysroot/etc/"bash.bash{rc,_logout} "./${_prefix}/${_target}/sysroot/etc/skel/".bash{rc,_profile,_logout})
@@ -71,7 +71,6 @@ package() {
   install -m644 dot.bashrc "$pkgdir/${_prefix}/${_target}/sysroot/etc/skel/.bashrc"
   install -m644 dot.bash_profile "$pkgdir/${_prefix}/${_target}/sysroot/etc/skel/.bash_profile"
   install -m644 dot.bash_logout "$pkgdir/${_prefix}/${_target}/sysroot/etc/skel/.bash_logout"
-  find "$pkgdir/${_prefix}/${_target}/sysroot/"{bin,lib} -name '*.a' -name '*.so' -type f -exec ${_arch}-strip -g {} \;
   rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
 }
 
@@ -114,3 +113,8 @@ md5sums=('2b44b47b905be16f45709648f671820b'
          'SKIP'
          'a682ed6fa2c2e7a7c3ba6bdeada07fb5'
          'SKIP')
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

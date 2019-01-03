@@ -9,16 +9,18 @@ depends=("${_target}-gcc")
 makedepends=("${_target}-cmake")
 url="http://www.zlib.net/"
 source=("http://zlib.net/zlib-${pkgver}.tar.gz")
-options=(!strip !buildflags staticlibs)
+options=(!buildflags staticlibs)
 md5sums=('1c9f62f0778697a09d36121ead88e08e')
 
 build() {
     rm -rf "${srcdir}/build-${_target}"
   	cp -r "${srcdir}/zlib-${pkgver}" "${srcdir}/build-${_target}"
   	cd "${srcdir}/build-${_target}"
-    
-    ${_target}-cmake \
-        -DINSTALL_INC_DIR="${_prefix}/${_target}/sysroot/usr/include" \
+    if [[ ${_cpu} == 'x86_64' ]]
+    then
+        CFG_FLAGS="-DAMD64=ON"
+    fi
+    ${_target}-cmake "${CFG_FLAGS}"\
         -DINSTALL_PKGCONFIG_DIR="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
         .
   	make 
@@ -27,6 +29,18 @@ build() {
 package () {
     cd "${srcdir}/build-${_target}"
     make install DESTDIR=${pkgdir}
+    if [[ ${_os} == mingw32* ]]
+    then
+        pushd "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
+            mv libzlib.dll.a libz.dll.a
+            mv libzlibstatic.a libz.a
+        popd
+    fi
     #sed "s,@prefix@,${_prefix},;s,@exec_prefix@,\${prefix},;s,@libdir@,\${exec_prefix}/lib,;s,@sharedlibdir@,\${libdir},;s,@includedir@,\${prefix}/include,;s,@VERSION@,$pkgver," < zlib.pc.in > "${pkgdir}/${_prefix}/lib/pkgconfig/zlib.pc"
-    find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
+    #find "$pkgdir/${_prefix}/${_target}" -type f \( -name '*.a' -o -name '*.so.?*' -o -name '*.dll' \) -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

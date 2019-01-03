@@ -10,7 +10,7 @@ pkgdesc="Utility libraries for XC Binding - Standard X key constants and convers
 arch=('x86_64')
 url="https://xcb.freedesktop.org"
 license=('custom')
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-libxcb>=1.7")
 makedepends=("${_target}-xorg-util-macros" "${_target}-configure")
 source=("https://xcb.freedesktop.org/dist/${_basename}-${pkgver}.tar.bz2"
@@ -27,5 +27,9 @@ build() {
 package() { 
   cd ${_basename}-${pkgver}
   make DESTDIR="${pkgdir}" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

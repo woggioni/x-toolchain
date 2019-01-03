@@ -10,7 +10,7 @@ pkgdesc="Portable lossless data compression library"
 arch=('x86_64')
 url="http://www.oberhumer.com/opensource/lzo"
 license=('GPL')
-options=(!strip !buildflags staticlibs)
+options=(!buildflags staticlibs)
 depends=("${_target}-gcc")
 makedepends=("${_target}-configure")
 source=(http://www.oberhumer.com/opensource/lzo/download/lzo-${pkgver}.tar.gz)
@@ -32,8 +32,12 @@ package() {
 
   # install minilzo
   install -m 755 libminilzo.so.0 "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
-  install -p -m 644 minilzo/minilzo.h "${pkgdir}/${_prefix}/${_target}/sysroot/usr/include/lzo"
+  install -p -m 644 minilzo/minilzo.h "${pkgdir}/${_prefix}/${_target}/sysroot/include/lzo"
   cd ${pkgdir}/${_prefix}/${_target}/sysroot/lib
   ln -s libminilzo.so.0 libminilzo.so
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

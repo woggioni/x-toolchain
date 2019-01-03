@@ -10,7 +10,7 @@ pkgdesc="Support library for libgcrypt"
 arch=(x86_64)
 url="https://www.gnupg.org"
 license=('LGPL')
-options=(staticlibs !strip !buildflags)
+options=(staticlibs !buildflags)
 depends=("${_target}-gcc" 'sh')
 makedepends=("${_target}-configure")
 source=(https://www.gnupg.org/ftp/gcrypt/libgpg-error/${_basename}-${pkgver}.tar.bz2{,.sig})
@@ -22,16 +22,19 @@ validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6'  # Werner Koch
 build() {
   cd ${_basename}-${pkgver}
 
-  if [[ $_os == linux* ]] && [[ $_cpu == x86_64 ]] && [[ ${_os} == "linux-musl" ]]
+  if [[ $_os == linux* ]]
   then
-    cp src/syscfg/lock-obj-pub.x86_64-unknown-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
-  elif [[ $_os == linux* ]] && [[ $_cpu == arm ]]
-  then
-    cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
+    if [[ $_cpu == x86_64 ]] && [[ ${_os} == "linux-musl" ]]
+    then
+      cp src/syscfg/lock-obj-pub.x86_64-unknown-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
+    elif [[ $_cpu == arm ]] && [[ ${_os} == linux-musl* ]]
+    then
+      cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_os}.h
+    fi
   fi
 
   ./configure --build="$CHOST" --host="${_cpu}-${_vendor}-${_os}" --target="${_cpu}-${_vendor}-${_os}" \
-    --prefix=${_prefix}/${_target} --libdir=${_prefix}/${_target}/sysroot/lib --includedir=${_prefix}/${_target}/sysroot/usr/include \
+    --prefix=${_prefix}/${_target} --libdir=${_prefix}/${_target}/sysroot/lib --includedir=${_prefix}/${_target}/sysroot/include \
     --enable-shared --enable-static
   make
 }
@@ -39,5 +42,9 @@ build() {
 package() {
   cd ${_basename}-${pkgver}
   make DESTDIR="${pkgdir}/" install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

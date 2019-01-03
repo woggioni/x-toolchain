@@ -10,7 +10,7 @@ pkgdesc="X transport library"
 arch=('any')
 license=('custom')
 url="https://xorg.freedesktop.org/"
-options=(staticlibs !strip !buildflags !emptydirs)
+options=(staticlibs !buildflags !emptydirs)
 makedepends=("${_target}-configure")
 source=(${url}/releases/individual/lib/${_basename}-${pkgver}.tar.bz2{,.sig})
 sha256sums=('adbd3b36932ce4c062cd10f57d78a156ba98d618bdb6f50664da327502bc8301'
@@ -27,5 +27,9 @@ package() {
   make DESTDIR="${pkgdir}" install
   install -m755 -d "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
   mv "${pkgdir}/${_prefix}/${_target}/sysroot/share/pkgconfig" "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

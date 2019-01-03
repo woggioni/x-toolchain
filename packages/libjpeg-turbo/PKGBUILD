@@ -12,7 +12,7 @@ arch=('x86_64')
 license=('custom')
 depends=("${_target}-gcc")
 makedepends=("${_target}-configure" 'nasm')
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 validpgpkeys=('7D6293CC6378786E1B5C496885C7044E033FDE16')
 source=("https://downloads.sourceforge.net/project/${_basename}/${pkgver}/${_basename}-${pkgver}.tar.gz"{,.sig})
 sha256sums=('33dd8547efd5543639e890efbf2ef52d5a21df81faf41bb940657af916a23406'
@@ -42,5 +42,9 @@ package() {
 		install
 	install -m 644 ../jpegint.h "${pkgdir}/${_prefix}/${_target}/sysroot/usr/include" # required by other software
 	rm -rf "${pkgdir}/${_prefix}/${_target}/sysroot/"{bin,share}
-	find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so*' -type f -exec ${_target}-strip -g {} \;
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

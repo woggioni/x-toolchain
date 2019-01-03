@@ -21,7 +21,7 @@ sha1sums=('2d8781e92f88706707a1e76fb628b499ad538a30'
           'SKIP')
 validpgpkeys=('031EC2536E580D8EA286A9F22071B08A33BD3F06' # "NIIBE Yutaka (GnuPG Release Key) <gniibe@fsij.org>"
               'D8692123C4065DEA5E0F3AB5249B39D24F25E3B6') # Werner Koch
-options=(staticlibs !strip !buildflags !makeflags)
+options=(staticlibs !buildflags !makeflags)
 prepare() {
   cd ${_basename}-${pkgver}
   # tests fail due to systemd+libseccomp preventing memory syscalls when building in chroots
@@ -45,6 +45,10 @@ build() {
 package() {
   cd ${_basename}-${pkgver}
   make DESTDIR=${pkgdir} install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
   rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

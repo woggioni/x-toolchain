@@ -8,7 +8,7 @@ pkgrel=1
 pkgdesc="International Components for Unicode library"
 arch=(x86_64)
 url="http://www.icu-project.org/"
-options=('staticlibs' '!strip' '!buildflags')
+options=('staticlibs' '!buildflags')
 license=('custom:icu')
 depends=('sh')
 depends=("${_target}-gcc" "${_target}-zlib" "${_target}-bzip2")
@@ -47,6 +47,10 @@ package() {
   cd icu/source
   pushd build-${_target}
   make -j1 DESTDIR=${pkgdir} install
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
   popd
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip
