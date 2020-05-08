@@ -5,7 +5,7 @@
 
 pkgname="${_target}-python"
 _basename="${pkgname#${_target}-}"
-pkgver=3.7.1
+pkgver=3.8.2
 pkgrel=1
 pkgdesc="Next generation of the python high-level scripting language"
 url="http://www.python.org/"
@@ -32,9 +32,6 @@ replaces=("${_target}-python3")
 
 prepare() {
   cd Python-${pkgver}
-
-  # FS#45809
-  patch -p1 -i ../dont-make-libpython-readonly.patch
 
   # FS#59997
   patch -p1 -i ../0001-compileall-Fix-ddir-when-recursing.patch

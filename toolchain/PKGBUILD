@@ -1,9 +1,9 @@
 # Maintainer: Mike Brown 
 # Maintainer: Kevin Mihelich
 pkgname="${_target}-gcc"
-pkgver="8.2.0"
+pkgver="9.2.0"
 pkgrel=1
-pkgdesc="ARM cross-toolchain based on musl C library"
+pkgdesc="X86_64 cross-toolchain based on musl C library"
 arch=('x86_64')
 makedepends=('docker')
 options=(!strip !buildflags staticlibs)

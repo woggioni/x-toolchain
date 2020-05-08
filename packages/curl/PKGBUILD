@@ -1,21 +1,36 @@
 # Contributor: ant32 <antreimer@gmail.com>
 
 pkgname="${_target}-curl"
-pkgver=7.62.0
+_basename="${pkgname#${_target}-}"
+pkgver=7.70.0
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
 arch=('any')
 url="http://curl.haxx.se"
 license=("MIT")
-depends=("${_target}-gcc"
-         "${_target}-libidn2"
-         "${_target}-libssh2"
-         "${_target}-openssl"
-         "${_target}-zlib")
+
+if [[ ${_os} == *"mingw"* ]]
+then
+  depends=("${_target}-gcc"
+          "${_target}-libidn2"
+          "${_target}-libssh2"
+          "${_target}-openssl"
+          "${_target}-zlib")
+  _idn_configure_flag="--with-libidn2"
+else
+  depends=("${_target}-gcc"
+          "${_target}-libssh2"
+          "${_target}-openssl"
+          "${_target}-zlib")
+  _idn_configure_flag=""
+fi
+
 makedepends=("${_target}-configure")
 options=('staticlibs' '!strip' '!buildflags')
-source=("$url/download/curl-$pkgver.tar.bz2")
-sha256sums=('7802c54076500be500b171fde786258579d60547a3a35b8c5a23d8c88e8f9620')
+source=("https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc})
+sha512sums=('76f073f8e2b18326d8741774927e99bad038b02fdb4446f2fa8c1bc1cd8909ec7e666d4bac67e7ee87a80ba7010fcf21750fa44bc13edcfbab8a287cb2e3660e'
+            'SKIP')
+validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') #
 
 build() {
   cd "${srcdir}"/${pkgname#${_target}-}-${pkgver}
@@ -25,7 +40,7 @@ build() {
                     --disable-manual \
                     --enable-ipv6 \
                     --enable-threaded-resolver \
-                    --with-libidn2 \
+                    ${_idn_configure_flag} \
                     --with-libssh2 \
                     --enable-versioned-symbols \
                     --with-gssapi \

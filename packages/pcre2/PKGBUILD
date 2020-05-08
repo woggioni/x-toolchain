@@ -1,5 +1,6 @@
 pkgname=${_target}-pcre2
-pkgver=10.32
+_basename="${pkgname#${_target}-}"
+pkgver=10.34
 pkgrel=1
 pkgdesc="	A library that implements Perl 5-style regular expressions. 2nd version (${_target})"
 arch=(any)
@@ -9,19 +10,14 @@ makedepends=(${_target}-configure ${_target}-readline ${_target}-bzip2 ${_target
 depends=("${_target}-gcc")
 options=(staticlibs !strip !buildflags)
 optdepends=(${_target}-readline ${_target}-bzip2 ${_target}-zlib)
-source=("ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre2-$pkgver.tar.bz2"
-"bug_2067.patch")
-md5sums=('8a096287153fb994970df3570e90fcb5'
-         '455e0e7bdb851f6c2fc5a208d880b49c')
 
-prepare() {
-  cd "$srcdir/pcre2-$pkgver"
-  patch -p1 -i ../bug_2067.patch
-}
+source=("https://ftp.pcre.org/pub/pcre/$_basename-$pkgver.tar.bz2"{,.sig})
+sha512sums=('77ad75f8b0b8bbfc2f57932596151bca25b06bd621e0f047e476f38cd127f43e2052460b95c281a7e874aad2b7fd86c8f3413f4a323abb74b9440a42d0ee9524'
+            'SKIP')
+validpgpkeys=('45F68D54BBE23FB3039B46E59766E084FB0F43D8')
 
 build() {
 	cd "$srcdir/pcre2-$pkgver"
-    unset LDFLAGS
     mkdir -p build-${_target} && pushd build-${_target}
     ${_target}-configure \
       --enable-jit \

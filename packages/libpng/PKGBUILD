@@ -4,7 +4,7 @@
 # Contributor: Travis Willard <travis@archlinux.org>
 # Contributor: Douglas Soares de Andrade <douglas@archlinux.org>
 pkgname="${_target}-libpng"
-pkgver=1.6.36
+pkgver=1.6.37
 _basename="${pkgname#${_target}-}"
 _apngver=${pkgver}
 pkgrel=2
@@ -18,8 +18,8 @@ options=('staticlibs' '!strip' '!buildflags')
 validpgpkeys=('8048643BA2C840F4F92A195FF54984BFA16C640F') # Glenn Randers-Pehrson (mozilla) <glennrp@gmail.com>
 source=("https://netix.dl.sourceforge.net/project/$_basename/libpng16/$pkgver/$_basename-$pkgver.tar.xz"
         "https://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-$_apngver-apng.patch.gz")
-sha256sums=('eceb924c1fa6b79172fdfd008d335f0e59172a86a66481e09d4089df872aa319'
-            '8c1f33da739b29a77e35e5a1ebcdffaab63bfe184be8b5a97677cc80156fdc0f')
+sha256sums=('505e70834d35383537b6491e7ae8641f1a4bed1876dbfe361201fc80868d88ca'
+            '823bb2d1f09dc7dae4f91ff56d6c22b4b533e912cbd6c64e8762255e411100b6')
 
 prepare() {
   cd "${_basename}-$pkgver"

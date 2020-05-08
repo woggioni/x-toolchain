@@ -3,9 +3,9 @@
 # Contributor: Allan McRae <allan@archlinux.org>
 # Contributor: judd <jvinet@zeroflux.org>
 pkgname=${_target}-ncurses
-_pkgver=6.1
+_pkgver=6.2
 pkgver=${_pkgver/-/+}
-pkgrel=3
+pkgrel=1
 pkgdesc='System V Release 4.0 curses emulation library'
 arch=(x86_64)
 url='http://invisible-island.net/ncurses/ncurses.html'
@@ -14,17 +14,16 @@ options=(staticlibs !strip !buildflags)
 depends=("${_target}-gcc")
 makedepends=("${_target}-configure")
 source=(https://ftp.gnu.org/pub/gnu/ncurses/ncurses-$pkgver.tar.gz{,.sig})
-md5sums=('98c889aaf8d23910d2b92d65be2e737a'
+md5sums=('e812da327b1c2214ac1aed440ea3ae8d'
          'SKIP')
 validpgpkeys=('C52048C0C0748FEE227D47A2702353E0F7E48EDB')  # Thomas Dickey
 
 build() {
   cd ${pkgname##${_target}-}-${_pkgver}
-
   ${_target}-configure --with-pkg-config-libdir="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
-    --with-shared --with-normal --without-debug --without-ada --disable-stripping\
-    --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared --includedir="${_prefix}/${_target}/sysroot/usr/include" \
-    --with-termlib=tinfo --with-ticlib=tic .
+    --with-shared --with-normal --without-debug --without-ada --without-tests --disable-termcap --disable-rpath-hack \
+    --disable-stripping --enable-widec --enable-pc-files --with-cxx-binding --with-cxx-shared --includedir="${_prefix}/${_target}/sysroot/usr/include" \
+    .
   make
 }
 
