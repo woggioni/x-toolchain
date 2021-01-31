@@ -3,17 +3,17 @@
 
 _reponame="crosstool-ng"
 pkgname="xng"
-pkgver=23.139c09d
+pkgver=5051.ea386017
 pkgrel=1
 pkgdesc="Crosstool-NG is a versatile (cross) toolchain generator"
 arch=('any')
 makedepends=('git' 'help2man')
 license=('custom')
 url="http://crosstool-ng.github.io/"
-source=("git+https://github.com/oggio88/crosstool-ng.git")
+source=("git+https://github.com/crosstool-ng/crosstool-ng.git")
 md5sums=('SKIP')
 pkgver() {
-  cd "${_pkgname}"
+  cd "${_reponame}"
   echo $(git rev-list --count master).$(git rev-parse --short master)
 }
 

@@ -22,14 +22,6 @@ prepare() {
 }
 
 build() {
-  cd $_basename-$pkgver
-  mkdir build-${_target} && pushd build-${_target}
-  ${_target}-configure
-  make
-  popd
-}
-
-build() {
   ${_target}-meson $_basename-$pkgver build \
     -D loongson-mmi=disabled \
     -D vmx=disabled \
@@ -43,7 +35,6 @@ build() {
 
 package() {
   DESTDIR="${pkgdir}" meson install -C build
-  find "$pkgdir/${_prefix}/${_target}" -name '*.a' -name '*.so' -type f -exec ${_target}-strip -g {} \;
 }
 
 strip() {

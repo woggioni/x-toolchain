@@ -31,9 +31,9 @@ package() {
   make DESTDIR=${pkgdir} install
 
   # install minilzo
-  install -m 755 libminilzo.so.0 "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
-  install -p -m 644 minilzo/minilzo.h "${pkgdir}/${_prefix}/${_target}/sysroot/include/lzo"
-  cd ${pkgdir}/${_prefix}/${_target}/sysroot/lib
+  install -m 755 libminilzo.so.0 "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib"
+  install -p -m 644 minilzo/minilzo.h "${pkgdir}/${_prefix}/${_target}/sysroot/usr/include/lzo"
+  cd ${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib
   ln -s libminilzo.so.0 libminilzo.so
 }
 

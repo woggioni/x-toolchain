@@ -26,8 +26,10 @@ build() {
 package() {
   cd $_basename-$pkgver
   make DESTDIR="$pkgdir" install
-  install -Dm644 LICENSE "$pkgdir"${_prefix}/${_target}/sysroot/share/licenses/$pkgname/LICENSE
-  rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
+  cp -rlT "$pkgdir"${_prefix}/${_target}/sysroot/usr/lib64 "$pkgdir"${_prefix}/${_target}/sysroot/usr/lib
+  rm -r "$pkgdir"${_prefix}/${_target}/sysroot/usr/lib64
+  install -Dm644 LICENSE "$pkgdir"${_prefix}/${_target}/sysroot/usr/share/licenses/$pkgname/LICENSE
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/share/info/dir"
 }
 
 strip() {

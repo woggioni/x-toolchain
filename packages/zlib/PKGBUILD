@@ -21,7 +21,10 @@ build() {
         CFG_FLAGS="-DAMD64=ON"
     fi
     ${_target}-cmake "${CFG_FLAGS}"\
-        -DINSTALL_PKGCONFIG_DIR="${_prefix}/${_target}/sysroot/lib/pkgconfig" \
+        -DINSTALL_INC_DIR="${_prefix}/${_target}/sysroot/usr/include" \
+        -DINSTALL_LIB_DIR="${_prefix}/${_target}/sysroot/usr/lib" \
+        -DINSTALL_MAN_DIR="${_prefix}/${_target}/sysroot/usr/share/man" \
+        -DINSTALL_PKGCONFIG_DIR="${_prefix}/${_target}/sysroot/usr/lib/pkgconfig" \
         .
   	make 
 }
@@ -31,7 +34,7 @@ package () {
     make install DESTDIR=${pkgdir}
     if [[ ${_os} == mingw32* ]]
     then
-        pushd "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
+        pushd "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib"
             mv libzlib.dll.a libz.dll.a
             mv libzlibstatic.a libz.a
         popd

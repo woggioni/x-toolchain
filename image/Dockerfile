@@ -1,12 +1,13 @@
-FROM debian:8
+FROM debian:8.11
 MAINTAINER Oggioni Walter <oggioni.walter@gmail.com>
 RUN apt-get update 
 RUN apt-get -y install libtool-bin build-essential git autoconf gcc gperf bison flex texinfo
-RUN apt-get -y install pkg-config help2man make libncurses5-dev python-dev bzip2 xz-utils gawk wget curl unzip
+RUN apt-get -y install pkg-config help2man make libncurses5-dev python3-dev bzip2 xz-utils gawk wget curl unzip
 RUN useradd luser -s /bin/bash -m -G users
 WORKDIR /tmp
-RUN git clone "https://github.com/oggio88/crosstool-ng.git"
+RUN git clone "https://github.com/crosstool-ng/crosstool-ng.git"
 WORKDIR crosstool-ng
+#RUN git checkout "crosstool-ng-1.24.0"
 RUN ./bootstrap
 RUN ./configure --prefix=/opt/xng
 RUN make

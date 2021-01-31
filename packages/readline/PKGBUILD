@@ -67,14 +67,20 @@ build() {
     fi
     bash_cv_wcwidth_broken=no ${_target}-configure \
       --target=${_target}
-    make #SHLIB_LIBS="-lncurses"
+    make SHLIB_LIBS="${CURSES_LIB}"
     popd
 }
 
 package() {
     cd "${srcdir}/readline-${_basever}/build-${_target}"
-    make install DESTDIR="${pkgdir}" #SHLIB_LIBS="-lncurses"
-    rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
+        if [[ ${_os} == mingw32* ]]
+    then
+        local CURSES_LIB="-lncursesw"
+    else
+        local CURSES_LIB="-lncurses"
+    fi
+    make install DESTDIR="${pkgdir}" SHLIB_LIBS="${CURSES_LIB}"
+    rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/share/info/dir"
 }
 
 strip() {

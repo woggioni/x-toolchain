@@ -5,7 +5,7 @@
 
 pkgname="${_target}-python"
 _basename="${pkgname#${_target}-}"
-pkgver=3.8.2
+pkgver=3.8.5
 pkgrel=1
 pkgdesc="Next generation of the python high-level scripting language"
 url="http://www.python.org/"
@@ -23,18 +23,14 @@ makedepends=("cmake" "ninja" "ccache" git "${_target}-configure")
 source=(
     "https://www.python.org/ftp/python/${pkgver}/Python-${pkgver}.tgz"
     "config.site"
-    "dont-make-libpython-readonly.patch"
-    "0001-compileall-Fix-ddir-when-recursing.patch"
 )
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+
+sha256sums=('SKIP' 'SKIP')
 provides=("${_target}-python3")
 replaces=("${_target}-python3")
 
 prepare() {
   cd Python-${pkgver}
-
-  # FS#59997
-  patch -p1 -i ../0001-compileall-Fix-ddir-when-recursing.patch
 
   # https://bugs.python.org/issue34587
   sed -i -e "s|testCongestion|disabled_&|" Lib/test/test_socket.py
@@ -55,7 +51,7 @@ prepare() {
 build() {
   mkdir build
   pushd build
-  export PKG_CONFIG_LIBDIR="${_prefix}/${_target}/sysroot/lib/pkgconfig"
+  export PKG_CONFIG_LIBDIR="${_prefix}/${_target}/sysroot/usr/lib/pkgconfig"
   CONFIG_SITE="${srcdir}/config.site" ${_target}-configure \
               --enable-shared \
               --with-threads \

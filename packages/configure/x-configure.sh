@@ -11,6 +11,11 @@ fi
 
 LDFLAGS=""
 ${config_path}/configure --build="$CHOST" --host=@TRIPLE@ --target=@TRIPLE@ \
-  --includedir=@PREFIX@/@TRIPLE@/sysroot/include --prefix=@PREFIX@/@TRIPLE@/sysroot \
+  --prefix=@PREFIX@/@TRIPLE@/sysroot \
+  --sbindir=@PREFIX@/@TRIPLE@/sysroot/usr/sbin \
+  --bindir=@PREFIX@/@TRIPLE@/sysroot/usr/bin \
+  --includedir=@PREFIX@/@TRIPLE@/sysroot/usr/include \
+  --libdir=@PREFIX@/@TRIPLE@/sysroot/usr/lib \
+  --datarootdir=@PREFIX@/@TRIPLE@/sysroot/usr/share \
   --enable-shared --enable-static "$@"
 

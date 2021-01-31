@@ -6,7 +6,7 @@
 pkgname=${_target}-bash
 _basename="${pkgname#${_target}-}"
 _basever=5.0
-_patchlevel=016
+_patchlevel=018
 pkgver=${_basever}.${_patchlevel}
 pkgrel=1
 pkgdesc='The GNU Bourne Again shell'
@@ -60,7 +60,7 @@ build() {
 
 package() {
   make -C $_basename-$_basever DESTDIR="$pkgdir" install
-  ln -s bash "$pkgdir/${_prefix}/${_target}/sysroot/bin/sh"
+  ln -s bash "$pkgdir/${_prefix}/${_target}/sysroot/usr/bin/sh"
 
   # system-wide configuration files
   install -Dm644 system.bashrc "$pkgdir/${_prefix}/${_target}/sysroot/etc/bash.bashrc"
@@ -71,7 +71,7 @@ package() {
   install -m644 dot.bashrc "$pkgdir/${_prefix}/${_target}/sysroot/etc/skel/.bashrc"
   install -m644 dot.bash_profile "$pkgdir/${_prefix}/${_target}/sysroot/etc/skel/.bash_profile"
   install -m644 dot.bash_logout "$pkgdir/${_prefix}/${_target}/sysroot/etc/skel/.bash_logout"
-  rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/share/info/dir"
 }
 
 md5sums=('2b44b47b905be16f45709648f671820b'
@@ -112,6 +112,10 @@ md5sums=('2b44b47b905be16f45709648f671820b'
          'c4c6ea23d09a74eaa9385438e48fdf02'
          'SKIP'
          'a682ed6fa2c2e7a7c3ba6bdeada07fb5'
+         'SKIP'
+         'd9dcaa1d8e7a24850449a1aac43a12a9'
+         'SKIP'
+         'a64d950d5de72ae590455b13e6afefcb'
          'SKIP')
 
 strip() {

@@ -63,7 +63,7 @@ package() {
     make DESTDIR="${pkgdir}" install
     cd "${srcdir}/${pkgname#${_target}-}-${pkgver}/build-${_target}"
     make DESTDIR="${pkgdir}" install
-    sed -i "s/-lidn2/-lidn2 -lunistring/g" "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig/libcurl.pc"
+    sed -i "s/-lidn2/-lidn2 -lunistring/g" "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig/libcurl.pc"
 }
 
 strip() {

@@ -1,7 +1,7 @@
 pkgname="${_target}-gcc"
-pkgver="9.2.0"
+pkgver="10.2.0"
 pkgrel=1
-pkgdesc="X86_64 cross-toolchain based on musl C library"
+pkgdesc="${_target} gcc cross-toolchain"
 arch=('x86_64')
 makedepends=('docker')
 options=(!strip !buildflags staticlibs)
@@ -27,12 +27,12 @@ package() {
   fi
   if [[ ${_os} = *"musl"* ]] 
   then
-    #rm -f "${pkgdir}${_prefix}/${_target}/lib"/*
-    #mv "${pkgdir}${_prefix}/${_target}/sysroot/lib"/* "${pkgdir}${_prefix}/${_target}/lib"
-    #rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
-    #ln -s "${_prefix}/${_target}/lib" "${pkgdir}${_prefix}/${_target}/sysroot/lib"
-    #rm "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpuf}.so.1"
-    #ln -s "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpuf}.so.1"
+    rm -f "${pkgdir}${_prefix}/${_target}/lib"/*
+    mv "${pkgdir}${_prefix}/${_target}/sysroot/lib"/* "${pkgdir}${_prefix}/${_target}/lib"
+    rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
+    ln -s "${_prefix}/${_target}/lib" "${pkgdir}${_prefix}/${_target}/sysroot/lib"
+    rm "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpuf}.so.1"
+    ln -s "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpuf}.so.1"
     ln -s "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/bin/${_target}-ldd"
   fi
 }

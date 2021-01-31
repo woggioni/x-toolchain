@@ -19,8 +19,14 @@ validpgpkeys=('45F68D54BBE23FB3039B46E59766E084FB0F43D8')
 build() {
 	cd "$srcdir/pcre2-$pkgver"
     mkdir -p build-${_target} && pushd build-${_target}
+    if [[ ${_cpu} == s390x ]]
+    then
+        local JIT_ENABLED="--disable-jit"
+    else
+        local JIT_ENABLED="--enable-jit"
+    fi
     ${_target}-configure \
-      --enable-jit \
+      ${JIT_ENABLED} \
       --enable-pcre2-16 \
       --enable-pcre2-32 \
       --enable-pcre2grep-libz \
