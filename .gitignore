@@ -1,1 +1,3 @@
 packages/*/*.tar.xz
+packages/*/src
+packages/*/pkg

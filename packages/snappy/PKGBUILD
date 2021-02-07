@@ -1,0 +1,63 @@
+# Maintainer: Dave Reisner <dreisner@archlinux.org>
+# Contributor: Antony Male <antony dot male at geemail dot com>>
+
+pkgname="${_target}-snappy"
+_basename="${pkgname#${_target}-}"
+pkgver=1.1.8
+pkgrel=2
+pkgdesc='A fast compressor/decompressor library'
+arch=('x86_64')
+url="https://google.github.io/snappy/"
+license=('BSD')
+depends=("${_target}-gcc")
+makedepends=("${_target}-cmake")
+options=('staticlibs' '!buildflags')
+source=("https://github.com/google/snappy/archive/$pkgver/$pkgname-$pkgver.tar.gz"
+        snappy.pc)
+md5sums=('70e48cba7fecf289153d009791c9977f'
+         '4b491e29a8142fedd11472306f5c1192')
+
+build() {
+  cd "${srcdir}/${_basename}-${pkgver}"
+
+  # compile without assertions
+  CXXFLAGS+=\ -DNDEBUG
+
+  # export CXX=clang++
+
+  mkdir -p build-${_target}-shared && pushd build-${_target}-shared
+  ${_target}-cmake \
+    -DCMAKE_INSTALL_PREFIX=${_prefix}/${_target}/sysroot/usr \
+    -DCMAKE_INSTALL_LIBDIR=${_prefix}/${_target}/sysroot/usr/lib \
+    -DBUILD_SHARED_LIBS=yes \
+    ..
+  make
+  popd
+
+  mkdir -p build-${_target}-static && pushd build-${_target}-static
+  ${_target}-cmake \
+    -DCMAKE_INSTALL_PREFIX=${_prefix}/${_target}/sysroot/usr \
+    -DCMAKE_INSTALL_LIBDIR=${_prefix}/${_target}/sysroot/usr/lib \
+    -DBUILD_SHARED_LIBS=OFF \
+    ..
+  make
+  popd
+}
+
+package() {
+  cd "${srcdir}/${_basename}-${pkgver}/build-${_target}-shared"
+  make DESTDIR="$pkgdir" install
+  cd "${srcdir}/${_basename}-${pkgver}/build-${_target}-static"
+  make DESTDIR="$pkgdir" install
+
+  # upstream dropped the pkgconfig file and isn't interested in adding it back.
+  # https://github.com/google/snappy/pull/55
+  install -Dm644 "$srcdir/snappy.pc" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig/snappy.pc"
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip
+
+# vim:set ts=2 sw=2 et:
