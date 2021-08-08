@@ -1,6 +1,7 @@
 # Maintainer: julienCXX <archlinux@chmodplusx.eu>
 pkgname="${_target}-libevent"
-pkgver=2.1.11
+_basename="${pkgname#${_target}-}"
+pkgver=2.1.12
 pkgrel=1
 pkgdesc="An event notification library (${_target})"
 arch=(any)
@@ -9,24 +10,24 @@ license=("BSD")
 makedepends=(${_target}-configure)
 depends=("${_target}-gcc" "${_target}-openssl")
 options=(!libtool !buildflags staticlibs)
-source=("https://github.com/libevent/libevent/releases/download/release-${pkgver}-stable/libevent-${pkgver}-stable.tar.gz"{,.asc})
-
-sha256sums=('a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d'
+source=(https://github.com/libevent/libevent/releases/download/release-$pkgver-stable/$_basename-$pkgver-stable.tar.gz{,.asc})
+sha256sums=('92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb'
             'SKIP')
 validpgpkeys=('B35BF85BF19489D04E28C33C21194EBB165733EA'
               '9E3AC83A27974B84D1B3401DB86086848EF8686D')
 
 build() {
-    unset LDFLAGS
-    mkdir -p "${srcdir}/${pkgname}-${pkgver}-build-${_target}"
-    cd "${srcdir}/${pkgname}-${pkgver}-build-${_target}"
-    ${_target}-configure ${srcdir}/${pkgname#${_target}-}-${pkgver}-stable
-    make
+  ${_target}-cmake -G Ninja\
+      -DCMAKE_BUILD_TYPE=Release\
+      -DCMAKE_INSTALL_PREFIX=${_prefix}/${_target}/sysroot/usr/\
+      -DCMAKE_INSTALL_LIBDIR=${_prefix}/${_target}/sysroot/usr/lib\
+      -DEVENT__LIBRARY_TYPE=SHARED\
+      -S ${_basename}-${pkgver}-stable -B build
+  cmake --build build
 }
 
 package() {
-    cd "${srcdir}/${pkgname}-${pkgver}-build-${_target}"
-    make DESTDIR="$pkgdir" install
+  DESTDIR="$pkgdir" cmake --build build --target install
 }
 
 strip() {
