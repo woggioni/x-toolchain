@@ -2,7 +2,7 @@
 
 pkgname="${_target}-curl"
 _basename="${pkgname#${_target}-}"
-pkgver=7.70.0
+pkgver=7.78.0
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
 arch=('any')
@@ -27,14 +27,15 @@ fi
 
 makedepends=("${_target}-configure")
 options=('staticlibs' '!buildflags')
+provides=("${_target}-libcurl.so")
 source=("https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc})
-sha512sums=('76f073f8e2b18326d8741774927e99bad038b02fdb4446f2fa8c1bc1cd8909ec7e666d4bac67e7ee87a80ba7010fcf21750fa44bc13edcfbab8a287cb2e3660e'
+sha512sums=('3d74343e06dd3d699f4c883758775554956f7f27de470b71f4af0d7f56ff5e4d7c534ab958c8926fae69cd0ded90c173ac3d5a6ad5518d88c2f39f31f8bba2f3'
             'SKIP')
-validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') #
+validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 
 build() {
   cd "${srcdir}"/${pkgname#${_target}-}-${pkgver}
-    configure_args="--with-ssl \
+    configure_args="--with-openssl \
                     --disable-ldap \
                     --disable-ldaps \
                     --disable-manual \

@@ -1,5 +1,5 @@
 pkgname="${_target}-gcc"
-pkgver="10.2.0"
+pkgver="11.2.0"
 pkgrel=1
 pkgdesc="${_target} gcc cross-toolchain"
 arch=('x86_64')
