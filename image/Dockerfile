@@ -1,4 +1,4 @@
-FROM debian:11.7
+FROM debian:12
 MAINTAINER Oggioni Walter <oggioni.walter@gmail.com>
 RUN apt-get update 
 RUN apt-get -y install libtool-bin build-essential git autoconf gcc gperf bison flex texinfo rsync
@@ -7,7 +7,7 @@ RUN useradd luser -s /bin/bash -m -G users
 WORKDIR /tmp
 RUN git clone "https://github.com/crosstool-ng/crosstool-ng.git"
 WORKDIR crosstool-ng
-RUN git checkout "crosstool-ng-1.24.0"
+RUN git checkout "crosstool-ng-1.26.0"
 RUN ./bootstrap
 RUN ./configure --prefix=/opt/xng
 RUN make

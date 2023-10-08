@@ -1,5 +1,5 @@
 pkgname="${_target}-gcc"
-pkgver="11.2.0"
+pkgver="13.2.0"
 pkgrel=1
 pkgdesc="${_target} gcc cross-toolchain"
 arch=('x86_64')
@@ -27,7 +27,7 @@ package() {
   fi
   if [[ ${_os} = *"musl"* ]] 
   then
-    rm -f "${pkgdir}${_prefix}/${_target}/lib"/*
+    rm -rf "${pkgdir}${_prefix}/${_target}/lib"/*
     mv "${pkgdir}${_prefix}/${_target}/sysroot/lib"/* "${pkgdir}${_prefix}/${_target}/lib"
     rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
     ln -s "${_prefix}/${_target}/lib" "${pkgdir}${_prefix}/${_target}/sysroot/lib"
