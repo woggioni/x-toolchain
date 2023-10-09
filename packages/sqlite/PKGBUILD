@@ -3,10 +3,10 @@
 # Contributor: Tom Newsom <Jeepster@gmx.co.uk>
 
 pkgname="${_target}-sqlite"
-_srcver=3360000
+_srcver=3430100
 _docver=${_srcver}
 #_docver=3330000
-pkgver=3.36.0
+pkgver=3.43.1
 pkgrel=1
 pkgdesc="A C library that implements an SQL database engine"
 arch=('x86_64')
@@ -14,8 +14,8 @@ license=('custom:Public Domain')
 url="http://www.sqlite.org/"
 depends=("${_target}-gcc" "${_target}-readline")
 makedepends=("${_target}-readline" "${_target}-configure")
-source=("https://www.sqlite.org/2021/sqlite-autoconf-${_srcver}.tar.gz")
-sha256sums=('bd90c3eb96bee996206b83be7065c9ce19aef38c3f4fb53073ada0d0b69bbce3')
+source=("https://www.sqlite.org/2023/sqlite-autoconf-${_srcver}.tar.gz")
+sha256sums=('39116c94e76630f22d54cd82c3cea308565f1715f716d1b2527f1c9c969ba4d9')
 options=('!emptydirs' '!makeflags' 'staticlibs' '!buildflags') # json extensions breaks parallel build
 
 prepare() {
@@ -30,6 +30,7 @@ build() {
                              -DSQLITE_ENABLE_UNLOCK_NOTIFY \
                              -DSQLITE_ENABLE_DBSTAT_VTAB=1 \
                              -DSQLITE_ENABLE_FTS3_TOKENIZER=1 \
+                             -DSQLITE_ENABLE_FTS3_PARENTHESIS \
                              -DSQLITE_SECURE_DELETE \
                              -DSQLITE_ENABLE_STMTVTAB \
                              -DSQLITE_MAX_VARIABLE_NUMBER=250000 \

@@ -4,7 +4,7 @@ epoch=1
 pkgver=1.9.3
 pkgrel=2
 pkgdesc='Extremely fast compression algorithm'
-arch=('any')
+arch=('x86_64')
 url='http://www.lz4.org/'
 license=('GPL2')
 makedepends=('git')
@@ -32,15 +32,15 @@ prepare() {
 
 build() {
     ${_target}-meson ${_basename}/contrib/meson build \
-        -Dbin_contrib=true\
-        -Dbin_programs=true\
+        -Dbin_contrib=false\
+        -Dbin_programs=false\
         -Db_lto=true\
         -Ddefault_library=both
     meson compile -C build
 }
 
 package() {
-  meson install -C build --destdir "${pkgdir}" 
+  meson install -C build --destdir "${pkgdir}"
 }
 
 strip() {

@@ -1,0 +1,31 @@
+pkgbase=libtasn1
+pkgname="${_target}-${pkgbase}"
+pkgver=4.19.0
+pkgrel=1
+pkgdesc="The ASN.1 library used in GNUTLS"
+arch=('x86_64')
+license=('GPL3' 'LGPL')
+url="https://www.gnu.org/software/libtasn1/"
+depends=("${_target}-gcc")
+options=(!buildflags staticlibs)
+source=(https://ftp.gnu.org/gnu/libtasn1/${pkgbase}-${pkgver}.tar.gz{,.sig})
+sha256sums=('1613f0ac1cf484d6ec0ce3b8c06d56263cc7242f1c23b30d82d23de345a63f7a'
+            'SKIP')
+validpgpkeys=('B1D2BD1375BECB784CF4F8C4D73CF638C53C06BE') # "Simon Josefsson <simon@josefsson.org>"
+
+build() {
+  cd ${pkgbase}-${pkgver}
+  ${_target}-configure --enable-static --enable-shared .
+  CODE_COVERAGE_LDFLAGS=${LDFLAGS} make
+}
+
+package() {
+  cd ${pkgbase}-${pkgver}
+  make DESTDIR="${pkgdir}" install
+  rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/"{bin,share}
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

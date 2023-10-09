@@ -1,5 +1,5 @@
 pkgname="${_target}-libssh2"
-pkgver=1.9.0
+pkgver=1.11.0
 pkgrel=1
 pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts (${_target})"
 arch=(any)
@@ -11,7 +11,7 @@ options=(!libtool staticlibs !buildflags)
 source=("$url/download/${pkgname#${_target}-}-$pkgver.tar.gz"
         "config.sub"
 )
-md5sums=('1beefafe8963982adc84b408b2959927' 
+md5sums=('a01d543fd891ca48fe47726540d50b17' 
          'SKIP')
 
 prepare() {

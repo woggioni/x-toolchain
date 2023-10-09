@@ -2,35 +2,46 @@
 # Maintainer:  Bartłomiej Piotrowski <bpiotrowski@archlinux.org>
 # Contributor: Allan McRae <allan@archlinux.org>
 # Contributor: judd <jvinet@zeroflux.org>
-pkgname=${_target}-ncurses
-_pkgver=6.2
+pkgname="${_target}-ncurses"
+_basename="${pkgname#${_target}-}"
+_pkgver=6.4_20230520
 pkgver=${_pkgver/-/+}
 pkgrel=1
 pkgdesc='System V Release 4.0 curses emulation library'
-arch=(x86_64)
+arch=('x86_64')
 url='http://invisible-island.net/ncurses/ncurses.html'
 license=(MIT)
 options=(staticlibs !buildflags)
 depends=("${_target}-gcc")
 makedepends=("${_target}-configure")
-source=(https://ftp.gnu.org/pub/gnu/ncurses/ncurses-$pkgver.tar.gz{,.sig}
-        001-use-libsystre.patch)
-md5sums=('e812da327b1c2214ac1aed440ea3ae8d'
-         'SKIP'
-         'b669861903d0699b6535b7c6e028880d')
-validpgpkeys=('C52048C0C0748FEE227D47A2702353E0F7E48EDB')  # Thomas Dickey
+source=(
+  "https://invisible-mirror.net/archives/$_basename/current/$_basename-${pkgver/_/-}.tgz"{,.asc}
+  "${_basename}-6.3-libs.patch"
+  "${_basename}-6.3-pkgconfig.patch")
+sha512sums=('bbb1dd33f4c701165b7612657a7577d3175b94c5815a89eaab3a8774510feb9322d284896dba8d3896f6dd89a8b98031829a76f7e3397aebb6cf2a71e989f93c'
+            'SKIP'
+            'adb02b838c40f1e58a1b31c26d5cd0f2a1c43f3b6d68e839981764c0f6c905a9eb51dd36ff018628fdeb20747cc7467727d57135408ab4848259384077a52b28'
+            '2d2c0ec3c880e638ab4aa3dbff5e28e4cd233153e24816bd87e077f848aa3edd5114cd0f2a7f6e8869dd1861a2746e512886c18264ff1676927dcc320c5ef958')
+b2sums=('d5e88198140ab6471a36bef08685e17ac2e43b4e66b53abaa961d5f8912eb3eae3784db194436c2b3e5f2deaeefaaed93e0550bcab0456f1486fc35d0cdac440'
+        'SKIP'
+        '31bb10e82dd018a75e57252052650d9f0f5eb5e7e887118c2ea40032b11f59ec6aa4d9bae804c615cbecdf3382f3434e0c9e9e8440fdefe66a507be020b8965c'
+        'fb6cf606cf3db7f6b306272696a63bce83d52cfa91e850f9a7bdb9d3d8455a26943529a9cf79731dddc7f763c27211a9afab9c4c31dbb6d12fd720eb390eb0a3')
+
+validpgpkeys=('19882D92DDA4C400C22C0D56CC2AF4472167BE03')  # Thomas Dickey
 
 
 prepare() {
-  if [[ ${_os} == mingw32* ]]
-  then
-      cd ${pkgname##${_target}-}-${_pkgver}
-      patch -Np1 -i "${srcdir}/001-use-libsystre.patch"
-  fi
+  # do not link against test libraries
+  patch -Np1 -d $_basename-${pkgver/_/-} -i ../$_basename-6.3-libs.patch
+  # do not leak build-time LDFLAGS into the pkgconfig files:
+  # https://bugs.archlinux.org/task/68523
+  patch -Np1 -d $_basename-${pkgver/_/-} -i ../$_basename-6.3-pkgconfig.patch
+  # NOTE: can't run autoreconf because the autotools setup is custom and ancient
 }
 
+
 build() {
-  cd ${pkgname##${_target}-}-${_pkgver}
+  cd $srcdir/${_basename}-${pkgver/_/-}
 
   if [[ ${_os} == mingw32* ]]
   then
@@ -75,7 +86,7 @@ build() {
 }
 
 package() {
-  cd ${pkgname##${_target}-}-${_pkgver}
+  cd ${pkgname##${_target}-}-${pkgver/_/-}
   make DESTDIR="$pkgdir" install
   #rm "${pkgdir}${_prefix}/${_target}/lib/terminfo"
   # fool packages looking to link to non-wide-character ncurses libraries

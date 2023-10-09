@@ -5,7 +5,7 @@ ld = '@PREFIX@/bin/@TRIPLE@-ld'
 ar = '@PREFIX@/bin/@TRIPLE@-ar'
 strip = '@PREFIX@/bin/@TRIPLE@-strip'
 pkgconfig = '@PREFIX@/bin/@TRIPLE@-pkg-config'
-#exe_wrapper = '@PREFIX@/@TRIPLE@/lib/ld-linux.so'
+exe_wrapper = '@DYNAMIC_LINKER@'
 
 [host_machine]
 system = '@OS@'
@@ -18,3 +18,11 @@ system = '@OS@'
 cpu_family = '@CPU@'
 cpu = 'sandybridge'
 endian = 'little'
+
+[built-in options]
+c_link_args = ['-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib', '-Wl,-dynamic-linker=@DYNAMIC_LINKER@']
+cpp_link_args = ['-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib', '-Wl,-dynamic-linker=@DYNAMIC_LINKER@']
+
+[properties]
+needs_exe_wrapper = @NEEDS_EXE_WRAPPER@
+

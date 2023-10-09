@@ -4,17 +4,17 @@
 
 pkgname="${_target}-json-c"
 _basename="${pkgname#${_target}-}"
-pkgver=0.15
+pkgver=0.17
 pkgrel=1
 pkgdesc="A JSON implementation in C"
 url="https://github.com/json-c/json-c/wiki"
 license=(MIT)
-arch=(x86_64)
+arch=('x86_64')
 depends=("${_target}-gcc")
 options=('staticlibs' '!buildflags')
 makedepends=(git "${_target}-cmake")
 provides=("${_target}-libjson-c.so")
-_commit=9021cdcdd01fc9dbcbe1f06391848c2ac915212f  # tags/json-c-0.15-20200726^0
+_commit=b4c371fa0cbc4dcbaccc359ce9e957a22988fb34  # tags/json-c-0.17-20230812^0
 source=("git+https://github.com/json-c/json-c#commit=$_commit")
 sha256sums=('SKIP')
 

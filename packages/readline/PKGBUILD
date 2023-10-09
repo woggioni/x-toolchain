@@ -4,12 +4,12 @@
 # Thanks to the patch from the MXE project <mxe.cc>
 
 pkgname=${_target}-readline
-_basever=8.1
+_basever=8.2
 _patchlevel=001
 pkgver=$_basever.$_patchlevel
 pkgrel=1
 pkgdesc="Library for editing typed command lines (${_target})"
-arch=('any')
+arch=('x86_64')
 depends=("${_target}-gcc" "${_target}-ncurses")
 makedepends=("${_target}-configure")
 provides=("${_target}-libhistory.so" "${_target}-libreadline.so")
@@ -26,10 +26,10 @@ if [ $_patchlevel -gt 0 ]; then
     done
 fi
 
-md5sums=('e9557dd5b1409f5d7b37ef717c64518e'
+md5sums=('4aa1b31be779e6b84f9a96cb66bc50f6'
          'SKIP'
          '58d54966c1191db45973cb3191ac621a'
-         '8d127cb06ae797a05fba88ada117e6f7'
+         'b800ce35690436a995a4fadf939e53cc'
          'SKIP')
 
 prepare() {

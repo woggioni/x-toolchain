@@ -2,10 +2,10 @@
 
 pkgname="${_target}-curl"
 _basename="${pkgname#${_target}-}"
-pkgver=7.78.0
+pkgver=8.3.0
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
-arch=('any')
+arch=('x86_64')
 url="http://curl.haxx.se"
 license=("MIT")
 
@@ -15,13 +15,15 @@ then
           "${_target}-libidn2"
           "${_target}-libssh2"
           "${_target}-openssl"
-          "${_target}-zlib")
+          "${_target}-zlib"
+          "${_target}-libnghttp2")
   _idn_configure_flag="--with-libidn2"
 else
   depends=("${_target}-gcc"
           "${_target}-libssh2"
           "${_target}-openssl"
-          "${_target}-zlib")
+          "${_target}-zlib"
+          "${_target}-libnghttp2")
   _idn_configure_flag=""
 fi
 
@@ -29,34 +31,34 @@ makedepends=("${_target}-configure")
 options=('staticlibs' '!buildflags')
 provides=("${_target}-libcurl.so")
 source=("https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc})
-sha512sums=('3d74343e06dd3d699f4c883758775554956f7f27de470b71f4af0d7f56ff5e4d7c534ab958c8926fae69cd0ded90c173ac3d5a6ad5518d88c2f39f31f8bba2f3'
+sha512sums=('838f96b6faee949ae70060420d1cc31f3eb018160aaebef53acc850d9cd6d68cf15bf5d76e2838474aff05cb7f51b054bbada09a6257c60ff9892852bdc1da41'
             'SKIP')
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 
 build() {
   cd "${srcdir}"/${pkgname#${_target}-}-${pkgver}
-    configure_args="--with-openssl \
-                    --disable-ldap \
-                    --disable-ldaps \
-                    --disable-manual \
-                    --enable-ipv6 \
-                    --enable-threaded-resolver \
-                    ${_idn_configure_flag} \
-                    --with-libssh2 \
-                    --enable-versioned-symbols \
-                    --with-gssapi \
-                    --without-ca-bundle \
-                    --without-random"
-    mkdir -p build-${_target}-static && pushd build-${_target}-static
-    ${_target}-configure $configure_args \
-      --enable-static --disable-shared ..
-    make
-    popd
-    mkdir -p build-${_target} && pushd build-${_target}
-    ${_target}-configure $configure_args \
-      --disable-static --enable-shared ..
-    make
-    popd
+  _configure_args=(
+    --with-openssl
+    --disable-ldap
+    --disable-ldaps
+    --disable-manual
+    --enable-ipv6
+    --enable-threaded-resolver
+    ${_idn_configure_flag}
+    --with-libssh2
+    --enable-versioned-symbols
+    --with-gssapi
+    --with-ca-bundle="/etc/ssl/certs/ca-certificates.crt"
+    --without-random
+  )
+  mkdir -p build-${_target}-static && pushd build-${_target}-static
+  ${_target}-configure ${_configure_args[@]} --enable-static --disable-shared ..
+  make
+  popd
+  mkdir -p build-${_target} && pushd build-${_target}
+  ${_target}-configure ${_configure_args[@]} --disable-static --enable-shared ..
+  make
+  popd
 }
 
 package() {

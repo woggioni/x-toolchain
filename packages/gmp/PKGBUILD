@@ -1,0 +1,39 @@
+# Maintainer: Antonio Rojas <arojas@archlinux.org>
+# Contributor: Allan McRae <allan@archlinux.org>
+# Contributor: Jan de Groot <jgc@archlinux.org>
+
+pkgname=${_target}-gmp
+_basename="${pkgname#${_target}-}"
+pkgver=6.3.0
+pkgrel=1
+pkgdesc='A free library for arbitrary precision arithmetic'
+arch=(x86_64)
+options=(!buildflags staticlibs)
+url='https://gmplib.org/'
+depends=(gcc-libs sh)
+license=(LGPL3 GPL)
+source=(https://gmplib.org/download/gmp/gmp-$pkgver.tar.lz{,.sig})
+sha256sums=('be5c908a7a836c3a9bd9d62aa58563c5e9e7fef94c43a7f42dbc35bb6d02733c'
+            'SKIP')
+validpgpkeys=('343C2FF0FBEE5EC2EDBEF399F3599FF828C67298')   # Niels Möller
+
+build() {
+  cd $_basename-$pkgver
+
+  ${_target}-configure \
+    --enable-cxx \
+    --enable-fat .
+  make
+}
+
+package() {
+  cd $_basename-$pkgver
+  make DESTDIR="${pkgdir}" install
+  mv "$pkgdir/${_prefix}/${_target}/sysroot/include/gmp.h" "$pkgdir/${_prefix}/${_target}/sysroot/usr/include/gmp.h"
+  rm -rf "$pkgdir/${_prefix}/${_target}/sysroot/usr/share"
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

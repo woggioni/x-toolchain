@@ -1,17 +1,23 @@
 pkgname="${_target}-libunistring"
-pkgver=0.9.10
+_basename="${pkgname#${_target}-}"
+pkgver=1.1
 pkgrel=1
 pkgdesc="Library for manipulating Unicode strings and C strings. (${_target})"
-arch=(any)
+arch=('x86_64')
 url="http://www.gnu.org/software/libunistring/"
 license=("GPL")
 makedepends=("${_target}-configure")
 depends=("${_target}-gcc")
 options=(staticlibs !buildflags)
-source=(http://ftp.gnu.org/gnu/libunistring/libunistring-${pkgver}.tar.xz{,.sig})
-validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871')
-md5sums=('db08bb384e81968957f997ec9808926e'
-         'SKIP')
+provides=("${_target}-libunistring.so")
+source=(https://ftp.gnu.org/gnu/$_basename/${_basename}-${pkgver}.tar.xz{,.sig})
+validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871'  # Daiki Ueno <ueno@unixuser.org>
+              '9001B85AF9E1B83DF1BDA942F5BE8B267C6A406D') # Bruno Haible (Open Source Development) <bruno@clisp.org>
+sha256sums=('827c1eb9cb6e7c738b171745dac0888aa58c5924df2e59239318383de0729b98'
+            'SKIP')
+b2sums=('721adc90884006480055b95d0fa06cd862417aa02b467f1e14688292ad9c11f1e33520b14ed5dc2d2724c6df8713d3af1e8032014259d8355156cb72edfcb983'
+        'SKIP')
+
 
 build() {
 	cd "${srcdir}/libunistring-${pkgver}"

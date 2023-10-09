@@ -1,15 +1,20 @@
 pkgname=${_target}-expat
-pkgver=2.2.9
+_basename="${pkgname#${_target}-}"
+pkgver=2.5.0
 pkgrel=1
 pkgdesc="An XML parser library (${_target})"
-arch=(any)
+arch=('x86_64')
 url="http://expat.sourceforge.net"
 license=("custom")
 makedepends=("${_target}-configure")
 depends=("${_target}-gcc")
 options=(!buildflags staticlibs)
-source=("http://downloads.sourceforge.net/expat/expat-${pkgver}.tar.bz2")
-sha256sums=('f1063084dc4302a427dabcca499c8312b3a32a29b7d2506653ecc8f950a9a237')
+source=(https://github.com/libexpat/libexpat/releases/download/R_${pkgver//./_}/$_basename-$pkgver.tar.bz2{,.asc})
+sha512sums=('22fd904d75aab7506a85c03519b9cf79e44898c8e1ba6abf6cb7f95de71b8e63a7e2d5cf4395e3627d46035ea29342b3e631a8809fef8aad3f59976dc075ad17'
+            'SKIP')
+b2sums=('15a5dcd3af17995fb4299301710b38d609c1fe7a8d6a6284581fedd96e89e0c16526d0342fb55773ac9d678cd65dc5cdb1532c764eeb3a20ccdf1e168b96e337'
+        'SKIP')
+validpgpkeys=(3176EF7DB2367F1FCA4F306B1F9B0E909AF37285) # Sebastian Pipping
 
 build() {
   cd "${srcdir}/expat-${pkgver}"

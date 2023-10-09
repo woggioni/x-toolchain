@@ -16,4 +16,3 @@ exec meson setup \
   --buildtype      release \
   --wrap-mode      nofallback \
   "$@" \
-  -D               b_lto=true

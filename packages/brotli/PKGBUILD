@@ -1,0 +1,68 @@
+# Maintainer: Felix Yan <felixonmars@archlinux.org>
+# Maintainer: Levente Polyak <anthraxx[at]archlinux[dot]org>
+# Contributor: Lex Black <autumn-wind at web dot de>
+# Contributor: TingPing <tingping@tingping.se>
+# Contributor: Guillaume Horel <guillaume.horel@gmail.com>
+
+pkgbase=brotli
+pkgname="${_target}-brotli"
+_gitcommit=ed738e842d2fbdf2d6459e39267a633c4a9b2f5d
+pkgver=1.1.0
+pkgrel=1
+pkgdesc='Generic-purpose lossless compression algorithm'
+url='https://github.com/google/brotli'
+arch=('x86_64')
+license=('MIT')
+options=(!buildflags staticlibs)
+depends=(
+  "${_target}-gcc"
+)
+makedepends=(
+  git
+  ninja
+  "${_target}-cmake"
+)
+source=(${pkgbase}::"git+${url}#commit=${_gitcommit}")
+sha512sums=('SKIP')
+
+pkgver() {
+  cd ${pkgbase}
+  git describe --tags --match 'v*' | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+  cd ${pkgbase}
+  for _build_type in static dynamic
+  do
+    local _build_shared_libs
+    if [ $_build_type == 'dynamic' ]
+    then
+      _build_shared_libs=ON
+    else
+      _build_shared_libs=OFF
+    fi
+    ${_target}-cmake -S . -B build-${_build_type} \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=${_build_shared_libs} \
+        -DCMAKE_C_FLAGS="$CFLAGS -ffat-lto-objects"
+    cmake --build build-${_build_type}
+  done
+}
+
+
+package() {
+  provides=(${_target}-libbrotlicommon.so ${_target}-libbrotlidec.so ${_target}-libbrotlienc.so)
+
+  cd ${pkgbase}
+  for _build_type in static dynamic
+  do
+    DESTDIR="$pkgdir" cmake --install build-${_build_type}
+  done
+  rm ${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/brotli
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

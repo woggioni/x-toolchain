@@ -1,0 +1,28 @@
+diff --git a/openpgm/pgm/configure.ac b/openpgm/pgm/configure.ac
+index 5d1854c..670b663 100644
+--- a/openpgm/pgm/configure.ac
++++ b/openpgm/pgm/configure.ac
+@@ -175,12 +175,12 @@ AC_COMPILE_IFELSE(
+                 CFLAGS="$CFLAGS -DHAVE_EVENTFD"],
+         [AC_MSG_RESULT([no])])
+ # useful /proc system
+-AC_CHECK_FILES([/proc/cpuinfo])
++#AC_CHECK_FILES([/proc/cpuinfo])
+ # example: crash handling
+ AC_CHECK_FUNCS([backtrace])
+ # timing
+ AC_CHECK_FUNCS([pselect])
+-AC_CHECK_FILES([/dev/rtc])
++#AC_CHECK_FILES([/dev/rtc])
+ AC_MSG_CHECKING([for RDTSC instruction])
+ case "$host_os" in
+ darwin* | aix*)
+@@ -196,7 +196,7 @@ __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));]])],
+ 	[AC_MSG_RESULT([no])])
+ 	;;
+ esac
+-AC_CHECK_FILES([/dev/hpet])
++#AC_CHECK_FILES([/dev/hpet])
+ # event handling
+ AC_CHECK_FUNCS([poll])
+ AC_CHECK_FUNCS([epoll_ctl])

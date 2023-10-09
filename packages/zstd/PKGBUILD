@@ -1,54 +1,43 @@
-# Maintainer: Ronald van Haren <ronald.archlinux.org>
-# Contributor: Judd <jvinet@zeroflux.org> 
-
-# pkgname=${_target}-bzip2
-# _basename="${pkgname#${_target}-}"
-# pkgver=1.0.8
-# pkgrel=3
-# pkgdesc="A high-quality data compression program"
-# arch=(any)
-# license=('custom')
-# url="https://sourceware.org/bzip2/"
-# depends=("${_target}-gcc")
-# options=(!buildflags staticlibs)
-# source=(https://sourceware.org/pub/bzip2/$_basename-$pkgver.tar.gz{,.sig})
-# sha256sums=('ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269'
-#             'SKIP')
-# validpgpkeys=('EC3CFE88F6CA0788774F5C1D1AA44BE649DE760A') # Mark Wielaard <mark@klomp.org>
-
 pkgname=${_target}-zstd
 _basename="${pkgname#${_target}-}"
-pkgver=1.5.0
+pkgver=1.5.5
 pkgrel=1
 pkgdesc='Zstandard - Fast real-time compression algorithm'
-arch=(any)
+arch=('x86_64')
 url='https://www.zstd.net/'
 license=(BSD GPL2)
+options=(!buildflags staticlibs)
+makedepends=("${_target}-meson")
 depends=("${_target}-gcc" "${_target}-zlib" "${_target}-xz" "${_target}-lz4")
 provides=(${_target}-libzstd.so)
 source=(https://github.com/facebook/zstd/releases/download/v${pkgver}/zstd-${pkgver}.tar.zst{,.sig})
-sha256sums=('9aa8dfc1ca17f358b28988ca1f6e00ffe1c6f3198853f8d2022799e6f0669180'
+sha256sums=('ce264bca60eb2f0e99e4508cffd0d4d19dd362e84244d7fc941e79fa69ccf673'
             'SKIP')
-b2sums=('cfea18b2347bf893d9bd461e57113d0a141040a1f7a42db6221ed9662f84023f45b058df3382cc06d82596f8eb98e0806f3abe1e79155fafd46da2a8b746bfbe'
+b2sums=('2c2dc95f227e661ada23d8f6141bcd293505ce14e605f946ae00d4d4ac37d10b4eb08279ef7560618c67caf266431f76686fda5ae1921d698a6a93bbaf9a0052'
         'SKIP')
 validpgpkeys=(4EF4AC63455FC9F4545D9B7DEF8FE99528B52FFD)
 
 
+
 prepare() {
     ${_target}-meson\
-     -Dbin_programs=true\
-     -Dbin_contrib=true\
-     -Ddefault_library=both\
-     -Db_lto=true\
-     ${srcdir}/$_basename-$pkgver/build/meson ${srcdir}/build
+        -Dbin_programs=false\
+        -Dbin_contrib=false\
+        -Ddefault_library=both\
+        -Dzlib=enabled\
+        -Dlz4=enabled\
+        -Dlzma=enabled\
+        -Db_lto=false\
+        ${srcdir}/$_basename-$pkgver/build/meson\
+        ${srcdir}/build
 }
 
 build() {
-    meson compile -C build
+    meson compile -C ${srcdir}/build
 }
 
 package() {
-    meson install -C build --destdir "${pkgdir}"
+    meson install -C ${srcdir}/build --destdir "${pkgdir}"
 }
 
 strip() {

@@ -2,40 +2,64 @@
 # Maintainer: Kyle Keen <keenerd@gmail.com>
 pkgname=${_target}-zeromq
 _basename="${pkgname#${_target}-}"
-pkgver=4.3.2
+pkgver=4.3.4
 pkgrel=1
 pkgdesc="Fast messaging system built on sockets.  C and C++ bindings.  aka 0MQ, ZMQ."
 arch=('x86_64')
 url="http://www.zeromq.org"
 license=('LGPL')
-depends=("${_target}-gcc" "${_target}-libsodium")
-makedepends=('asciidoc' 'xmlto' "${_target}-configure")
+depends=("${_target}-gcc" "${_target}-libsodium" "${_target}-libpgm" "${_target}-gnutls" "${_target}-libevent")
+makedepends=("${_target}-cmake" "ninja")
 options=(!buildflags staticlibs)
-# "http://download.zeromq.org/$pkgname-$pkgver.tar.gz"
-source=("https://github.com/zeromq/libzmq/releases/download/v$pkgver/zeromq-$pkgver.tar.gz"
-        "zmq.hpp.$pkgver::https://raw.githubusercontent.com/zeromq/cppzmq/b0e6d4b/zmq.hpp")
-sha256sums=('ebd7b5c830d6428956b67a0454a7f8cbed1de74b3b01e5c33c5378e22740f763'
-            '02b73219656df3ffe3b231c7d0326e754a738ef2a83c8e94cd1e47d22cdd9535')
+provides=("${_target}-libzmq.so")
+_commit='4097855ddaaa65ed7b5e8cb86d143842a594eebd'
+source=(
+  "$_basename::git+https://github.com/zeromq/libzmq#commit=$_commit"
+)
 
-prepare() {
-  # Needed for new libsodium
-  sed -i 's/libzmq_werror="yes"/libzmq_werror="no"/' $_basename-$pkgver/configure
-  cp zmq.hpp.$pkgver zmq.hpp
+md5sums=('SKIP')
+
+pkgver() {
+  cd "$_basename"
+
+  git describe --tags | sed 's/^v//'
 }
 
+prepare() {
+  cd "$_basename"
+
+  # FTBFS: undefined references (openpgm)
+  git cherry-pick --no-commit 5381be6c71f2a34fea40a29c12e3f6f8dcf3bad2
+
+  # FTBFS: gcc 13
+  git cherry-pick --no-commit 438d5d88392baffa6c2c5e0737d9de19d6686f0d
+}
+
+
 build() {
-  cd "$srcdir/$_basename-$pkgver"
-  mkdir -p build-${_target} && pushd build-${_target}
-  ${_target}-configure --with-libsodium
-  make
-  popd
+  mkdir -p build
+  ${_target}-cmake \
+    -G Ninja \
+    -S "$_basename" \
+    -B build \
+    -D CMAKE_BUILD_TYPE=Release \
+    -D BUILD_SHARED=ON \
+    -D BUILD_STATIC=ON \
+    -D ENABLE_CPACK=OFF \
+    -D ENABLE_EVENTFD=ON \
+    -D ZMQ_BUILD_TESTS=OFF \
+    -D WITH_OPENPGM=ON \
+    -D WITH_LIBSODIUM=ON \
+    -D OPENPGM_PKGCONFIG_NAME=openpgm-5.3 \
+    -D WITH_LIBBSD=ON \
+    -D WITH_DOC=OFF \
+    -W no-dev
+  cmake --build build
 }
 
 package() {
-  pushd "$srcdir/$_basename-$pkgver/build-${_target}"
-  make DESTDIR="$pkgdir" install
-  install -Dm644 "$srcdir/zmq.hpp" "$pkgdir/${_prefix}/${_target}/sysroot/usr/include/zmq.hpp"
-  popd
+  DESTDIR="$pkgdir" cmake --install build
+  rm -r "$pkgdir/${_prefix}/${_target}/sysroot/"{bin,share}
 }
 
 strip() {
