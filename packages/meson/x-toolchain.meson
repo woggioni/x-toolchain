@@ -5,7 +5,7 @@ ld = '@PREFIX@/bin/@TRIPLE@-ld'
 ar = '@PREFIX@/bin/@TRIPLE@-ar'
 strip = '@PREFIX@/bin/@TRIPLE@-strip'
 pkgconfig = '@PREFIX@/bin/@TRIPLE@-pkg-config'
-exe_wrapper = '@DYNAMIC_LINKER@'
+@EXE_WRAPPER@
 
 [host_machine]
 system = '@OS@'

@@ -10,7 +10,7 @@ makedepends=("${_target}-cmake")
 url="http://www.zlib.net/"
 source=("http://zlib.net/zlib-${pkgver}.tar.gz")
 options=(!buildflags staticlibs)
-md5sums=('60373b133d630f74f4a1f94c1185a53f  ')
+md5sums=('60373b133d630f74f4a1f94c1185a53f')
 
 build() {
     rm -rf "${srcdir}/build-${_target}"

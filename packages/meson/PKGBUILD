@@ -10,15 +10,18 @@ source=("x-meson.sh" "x-toolchain.meson")
 md5sums=('SKIP' 'SKIP')
 
 build() {
+    _dynamic_linker=$(echo "${_prefix}/${_target}"/lib/ld-*.so*)  
     local _needs_exe_wrapper
+    local _exe_wrapper
     if [ $CARCH == $_cpu ]
-    then 
+    then
       _needs_exe_wrapper='false'
     else
+      _exe_wrapper="exe_wrapper = '${_dynamic_liner}'"
       _needs_exe_wrapper='true'
     fi
-    _dynamic_linker=$(echo "${_prefix}/${_target}"/lib/ld-*.so*)  
     sed -e "s|@DYNAMIC_LINKER@|${_dynamic_linker}|g"\
+      -e "s|@EXE_WRAPPER@|${_exe_wrapper}|g" \
       -e "s|@TRIPLE@|${_target}|g" \
       -e "s|@PREFIX@|${_prefix}|g" \
       -e "s|@CPU@|${_cpu}|g" \

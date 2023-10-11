@@ -40,6 +40,7 @@ build() {
 package() {
   cd "${_basename}-$pkgver/build-${_target}"
   make DESTDIR="$pkgdir" install
+  rm -r "$pkgdir/${_prefix}/${_target}/sysroot/usr/share"
 }
 
 strip() {
