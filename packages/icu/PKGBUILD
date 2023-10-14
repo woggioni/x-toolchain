@@ -3,7 +3,7 @@
 # Contributor: Art Gramlich <art@gramlich-net.com>
 pkgname="${_target}-icu"
 _basename="${pkgname#${_target}-}"
-pkgver=67.1
+pkgver=73.2
 pkgrel=1
 pkgdesc="International Components for Unicode library"
 arch=(x86_64)
@@ -14,15 +14,29 @@ depends=('sh')
 depends=("${_target}-gcc" "${_target}-zlib" "${_target}-bzip2")
 makedepends=("${_target}-configure")
 provides=(${_target}-libicu{data,i18n,io,test,tu,uc}.so)
-source=(https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/${_basename}4c-${pkgver//./_}-src.tgz{,.asc})
-# upstream offers md5sum checks, only asc file for md5sum check
-sha512sums=('4779f1ce1ca7976f6fad6768853ea8c540da54d11509e3b6cfd864a04b5f2db1c3d4b546387f91ad02fb90804525bc37d2543173f0d705d6ca11dc6f2b7640a8'
-            'SKIP')
-validpgpkeys=('BA90283A60D67BA0DD910A893932080F4FB419E3') #  "Steven R. Loomis (filfla-signing) <srloomis@us.ibm.com>" 
-validpgpkeys+=('9731166CD8E23A83BEE7C6D3ACA5DBE1FD8FABF1') #  "Steven R. Loomis (ICU Project) <srl@icu-project.org>" 
-validpgpkeys+=('FFA9129A180D765B7A5BEA1C9B432B27D1BA20D7') # "Fredrik Roubert <fredrik@roubert.name>"
-validpgpkeys+=('E4098B78AFC94394F3F49AA903996C7C83F12F11') # "keybase.io/srl295 <srl295@keybase.io>"
-validpgpkeys+=('4569BBC09DA846FC91CBD21CE1BBA44593CF2AE0') #
+source=("https://github.com/unicode-org/icu/releases/download/release-${pkgver//./-}/icu4c-${pkgver//./_}-src.tgz"{,.asc}
+        "0015-debug.mingw.patch"
+        "0016-icu-pkgconfig.patch"
+        "0021-mingw-static-libraries-without-s.patch")
+sha256sums=('818a80712ed3caacd9b652305e01afc7fa167e6f2e94996da44b90c2ab604ce1'
+            'SKIP'
+            '0181f9ff8b7dd0a423869d8772da0a4feea64188347eb0dee7eb059aea92131c'
+            '87ebe8962f8c387714f2a697a664a0c49aed2331b988548069d0c211abc36e05'
+            'd8612f40b1731d9a94290afcf80c896184a2f15b8ae8f23b3643c64f6cabfa2f')
+validpgpkeys=("FFA9129A180D765B7A5BEA1C9B432B27D1BA20D7"
+              "3DA35301A7C330257B8755754058F67406EAA6AB"
+              "0E51E7F06EF719FBD072782A5F56E5AFA63CCD33"
+              "4569BBC09DA846FC91CBD21CE1BBA44593CF2AE0")
+
+prepare() {
+  cd icu
+  patch -p1 -i ../0015-debug.mingw.patch
+  patch -p1 -i ../0016-icu-pkgconfig.patch
+  patch -p1 -i ../0021-mingw-static-libraries-without-s.patch
+
+  cd source
+  autoreconf -fi
+}
 
 build() {
   cd icu/source
@@ -48,6 +62,7 @@ package() {
   pushd build-${_target}
   make -j1 DESTDIR=${pkgdir} install
   popd
+  rm -r "$pkgdir/${_prefix}/${_target}/sysroot/usr/share"
 }
 
 strip() {

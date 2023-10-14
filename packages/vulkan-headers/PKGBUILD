@@ -1,0 +1,35 @@
+# Maintainer: Patrick Northon <northon_patrick3@yahoo.ca>
+
+_basename=vulkan-headers
+pkgname=${_target}-${_basename}
+_dirname=Vulkan-Headers
+pkgver=1.3.264
+pkgrel=3
+pkgdesc='Vulkan header files (mingw-w64)'
+arch=(any)
+url='https://www.khronos.org/vulkan/'
+license=('APACHE')
+makedepends=(${_target}-cmake)
+groups=("${_target}-vulkan-devel")
+options=(!buildflags staticlibs)
+source=("${_basename}.tar.gz::https://github.com/KhronosGroup/${_dirname}/archive/v${pkgver}.tar.gz")
+sha256sums=('bdce6a99f0e5869a341946ee0a92eef270ef9b4b106e82f238aa68aeb2cd4995')
+
+_srcdir="${_dirname}-${pkgver}"
+
+build() {
+  ${_target}-cmake -S "${_srcdir}" -B "build"
+  cmake --build "build"
+}
+
+package() {
+  DESTDIR="${pkgdir}" cmake --install "build"
+  mkdir -p "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib"
+  mv "${pkgdir}/${_prefix}/${_target}/sysroot/share/cmake" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib"
+  rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/share"
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

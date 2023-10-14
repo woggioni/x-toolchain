@@ -1,0 +1,54 @@
+# Maintainer: Patrick Northon <northon_patrick3@yahoo.ca>
+
+_pkgname=vulkan-icd-loader
+pkgname=${_target}-${_pkgname}
+_dirname=Vulkan-Loader
+pkgver=1.3.263
+pkgrel=1
+pkgdesc='Vulkan Installable Client Driver (ICD) Loader (mingw-w64)'
+arch=(any)
+url='https://www.khronos.org/vulkan/'
+groups=("${_target}-vulkan-devel")
+license=('APACHE')
+makedepends=(${_target}-cmake ${_target}-vulkan-headers python-lxml)
+depends=(${_target}-gcc)
+options=(!buildflags staticlibs)
+source=("${_pkgname}-${pkgver}.tar.gz::https://github.com/KhronosGroup/${_dirname}/archive/v${pkgver}.tar.gz")
+sha256sums=('9c84474c9668946ad0ff291df3147e109ede5bd417e512cdfe6c71e2a231dc08')
+
+_srcdir="${_dirname}-${pkgver}"
+_flags=(
+  -Wno-dev
+  -DCMAKE_BUILD_TYPE=Release
+  -DCMAKE_C_FLAGS_RELEASE='-DNDEBUG'
+  -DBUILD_WSI_XCB_SUPPORT=FALSE
+  -DBUILD_WSI_XLIB_SUPPORT=FALSE
+  -DBUILD_WSI_WAYLAND_SUPPORT=ON
+  -DBUILD_WSI_DIRECTFB_SUPPORT=OFF
+  -DUSE_MASM=OFF
+  -DJWASM_FOUND=0
+  -DENABLE_WERROR=OFF )
+
+prepare() {
+  cd "${_srcdir}"
+  
+  if [[ ${_os} == mingw* ]]
+  then 
+    sed -i 's|${CMAKE_CURRENT_SOURCE_DIR}/vulkan-1.def||' 'loader/CMakeLists.txt'
+    sed -i 's/__attribute__((visibility("default")))/__declspec(dllexport)/' 'loader/vk_loader_platform.h'
+  fi
+}
+
+build() {
+  ${_target}-cmake -S "${_srcdir}" -B "build" "${_flags[@]}" -DBUILD_TESTS=OFF
+  cmake --build "build"
+}
+
+package() {
+  DESTDIR="${pkgdir}" cmake --install "build"
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip
