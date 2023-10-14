@@ -2,15 +2,15 @@
 
 pkgname="${_target}-mpdecimal"
 _basename="${pkgname#${_target}-}"
-pkgver=2.4.2
-pkgrel=2
+pkgver=2.5.1
+pkgrel=1
 pkgdesc="Package for correctly-rounded arbitrary precision decimal floating point arithmetic"
 arch=('x86_64')
 url="http://www.bytereef.org/mpdecimal/index.html"
 license=('custom')
-depends=('glibc')
+depends=("${_target}-gcc")
 source=("http://www.bytereef.org/software/$_basename/releases/$_basename-$pkgver.tar.gz" "config.sub")
-sha512sums=('eb18ad53b81b93c469db4d915bbb3fae21b36ad82a88e01fef3a6946ac5f50b54376e259a5ecbe23836f1efd59d226b942ecdee87eaba7f9e75cdcaaa9499ef7' 'SKIP')
+sha512sums=('710cb5cb71dbcf3e170ca15869c148df0547b848400c6b6dd70c67d9961dbe1190af8fb4d1623bfb0ca2afe44f369a42e311ab5225ed89d4031cb49a3bd70f30' 'SKIP')
 options=('staticlibs' '!buildflags')
 
 prepare() {

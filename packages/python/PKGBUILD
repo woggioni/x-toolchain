@@ -5,7 +5,7 @@
 
 pkgname="${_target}-python"
 _basename="${pkgname#${_target}-}"
-pkgver=3.8.5
+pkgver=3.11.5
 pkgrel=1
 pkgdesc="Next generation of the python high-level scripting language"
 url="http://www.python.org/"
@@ -18,8 +18,9 @@ depends=("${_target}-gcc"
          "${_target}-zlib" 
          "${_target}-bzip2" 
          "${_target}-openssl"
+         "${_target}-mpdecimal"
          )
-makedepends=("cmake" "ninja" "ccache" git "${_target}-configure")
+makedepends=("cmake" "ninja" "ccache" git "${_target}-configure" "python=3.11.5")
 source=(
     "https://www.python.org/ftp/python/${pkgver}/Python-${pkgver}.tgz"
     "config.site"
@@ -43,9 +44,9 @@ prepare() {
 
   # Ensure that we are using the system copy of various libraries (expat, libffi, and libmpdec),
   # rather than copies shipped in the tarball
-  rm -r Modules/expat
-  rm -r Modules/_ctypes/{darwin,libffi}*
-  rm -r Modules/_decimal/libmpdec
+#  rm -r Modules/expat
+#  rm -r Modules/_ctypes/{darwin,libffi}*
+#  rm -r Modules/_decimal/libmpdec
 }
 
 build() {
@@ -64,6 +65,7 @@ build() {
               --with-system-ffi \
               --with-system-libmpdec \
               --enable-loadable-sqlite-extensions \
+              --with-build-python=/usr/bin/python \
               --without-ensurepip \
               "../Python-${pkgver}"
     make
@@ -73,6 +75,8 @@ build() {
 package() {
   pushd build
   make install DESTDIR="${pkgdir}"
+  mv "${pkgdir}/${_prefix}/${_target}/sysroot/lib/python3.11/"* "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/python3.11/"
+  rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
   popd
 }
 

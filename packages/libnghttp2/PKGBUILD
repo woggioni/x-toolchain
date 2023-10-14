@@ -4,7 +4,7 @@
 pkgname="${_target}-libnghttp2"
 _basename="${pkgname#${_target}-}"
 _tag='a1d5296e5114eac3801f9c12a5f5a698ff97abdb' # git rev-parse v${pkgver}
-pkgver=1.56.0
+pkgver=1.57.0
 pkgrel=1
 pkgdesc='Framing layer of HTTP/2 is implemented as a reusable C library'
 arch=('x86_64')

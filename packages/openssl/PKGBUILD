@@ -51,6 +51,9 @@ build() {
     else
       local _platform="linux-generic32"
     fi
+    local _rpath="-Wl,-rpath=${_prefix}/${_target}/sysroot/lib:${_prefix}/${_target}/sysroot/usr/lib"
+    local _dynamic_linker=$(echo "${_prefix}/${_target}"/lib/ld-*.so*)
+    export LDFLAGS="${_rpath} -Wl,-dynamic-linker=${_dynamic_linker}"
   elif [[ ${_os} == mingw* ]]; then
     if [[ ${_cpu} == x86_64 ]]
     then

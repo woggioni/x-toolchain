@@ -2,7 +2,7 @@
 
 pkgname="${_target}-curl"
 _basename="${pkgname#${_target}-}"
-pkgver=8.3.0
+pkgver=8.4.0
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
 arch=('x86_64')
@@ -31,7 +31,7 @@ makedepends=("${_target}-configure")
 options=('staticlibs' '!buildflags')
 provides=("${_target}-libcurl.so")
 source=("https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc})
-sha512sums=('838f96b6faee949ae70060420d1cc31f3eb018160aaebef53acc850d9cd6d68cf15bf5d76e2838474aff05cb7f51b054bbada09a6257c60ff9892852bdc1da41'
+sha512sums=('375d241effccde852cfba32aa61be406f6c6e8ef2773b48d57bfa1ff99fdf414dc08bdb6b3a65930e53b28e31246a4bc396c81054ae9c560a3bf58cca0ae78b0'
             'SKIP')
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 
