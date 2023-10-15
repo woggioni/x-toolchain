@@ -1,10 +1,12 @@
 [binaries]
-c = '@PREFIX@/bin/@TRIPLE@-gcc'
-cpp = '@PREFIX@/bin/@TRIPLE@-g++'
+c = ['ccache', '@PREFIX@/bin/@TRIPLE@-gcc']
+cpp = ['ccache', '@PREFIX@/bin/@TRIPLE@-g++']
 ld = '@PREFIX@/bin/@TRIPLE@-ld'
 ar = '@PREFIX@/bin/@TRIPLE@-ar'
+nm = '@PREFIX@/bin/@TRIPLE@-nm'
 strip = '@PREFIX@/bin/@TRIPLE@-strip'
 pkgconfig = '@PREFIX@/bin/@TRIPLE@-pkg-config'
+cmake = '@PREFIX@/bin/@TRIPLE@-cmake'
 @EXE_WRAPPER@
 
 [host_machine]

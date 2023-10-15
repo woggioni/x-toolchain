@@ -7,45 +7,47 @@
 
 pkgname=${_target}-libgcrypt
 _basename="${pkgname#${_target}-}"
-pkgver=1.8.5
+pkgver=1.10.2
 pkgrel=1
 pkgdesc="General purpose cryptographic library based on the code from GnuPG"
 arch=(x86_64)
 url="http://www.gnupg.org"
 license=('LGPL')
+options=(staticlibs !buildflags)
 depends=("${_target}-libgpg-error")
 makedepends=("${_target}-configure")
-# https://www.gnupg.org/download/integrity_check.html
-source=(https://gnupg.org/ftp/gcrypt/${_basename}/${_basename}-${pkgver}.tar.bz2{,.sig})
-sha1sums=('2d8781e92f88706707a1e76fb628b499ad538a30'
-          'SKIP')
-validpgpkeys=('031EC2536E580D8EA286A9F22071B08A33BD3F06' # "NIIBE Yutaka (GnuPG Release Key) <gniibe@fsij.org>"
-              'D8692123C4065DEA5E0F3AB5249B39D24F25E3B6') # Werner Koch
-options=(staticlibs !buildflags !makeflags)
+source=("https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${pkgver}.tar.bz2"{,.sig}
+        "libgcrypt-use-correct-def-file.patch"
+        "Smarter-fig2dev-detection.all.patch")
+sha1sums=('0b9555960d84a09ea14e52360808f2e02e9c12d2'
+          'SKIP'
+          '0f03d59dee4b967dfa80621ef4b1efea61772c16'
+          '3613a5454aeaef8d264011f2bc9f2303248fb933')
+validpgpkeys=('6DAA6E64A76D2840571B4902528897B826403ADA') # Werner Koch
+
 prepare() {
   cd ${_basename}-${pkgver}
-  # tests fail due to systemd+libseccomp preventing memory syscalls when building in chroots
-  #  t-secmem: line 176: gcry_control (GCRYCTL_INIT_SECMEM, pool_size, 0) failed: General error
-  #  FAIL: t-secmem
-  #  t-sexp: line 1174: gcry_control (GCRYCTL_INIT_SECMEM, 16384, 0) failed: General error
-  #  FAIL: t-sexp
-  sed -i "s:t-secmem::" tests/Makefile.am
-  sed -i "s:t-sexp::" tests/Makefile.am
-  autoreconf -vfi 
+  patch -p1 -i "$srcdir"/libgcrypt-use-correct-def-file.patch
+  patch -p1 -i "${srcdir}"/Smarter-fig2dev-detection.all.patch
+  autoreconf -fi 
 }
 
 build() {
-  cd ${_basename}-${pkgver}
+  mkdir build
+  cd build
   ${_target}-configure \
+    --with-gpg-error-prefix="${_prefix}/${_target}/sysroot/" \
+    --enable-static \
+    --enable-shared \
     --disable-asm \
-	  --disable-padlock-support .
+	  --disable-padlock-support "${srcdir}/${_basename}-${pkgver}"
   make
 }
 
 package() {
-  cd ${_basename}-${pkgver}
+  cd build
   make DESTDIR=${pkgdir} install
-  rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/share/info/dir"
 }
 
 strip() {

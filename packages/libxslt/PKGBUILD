@@ -4,7 +4,7 @@
 
 pkgname="${_target}-libxslt"
 _basename="${pkgname#${_target}-}"
-pkgver=1.1.34
+pkgver=1.1.38
 pkgrel=1
 pkgdesc="XML stylesheet transformation library"
 url="http://xmlsoft.org/XSLT/"
@@ -14,26 +14,23 @@ options=(staticlibs !buildflags)
 depends=("${_target}-libxml2" "${_target}-libgcrypt")
 makedepends=(git "${_target}-configure")
 checkdepends=(docbook-xml)
-_commit=3653123f992db24cec417d12600f4c67388025e3  # tags/v1.1.34^0
-source=("git+https://gitlab.gnome.org/GNOME/libxslt.git#commit=$_commit"
-        0002-Make-generate-id-deterministic.patch)
-sha256sums=('SKIP'
-            '371f8a27e57f648315d2ef73499e9bdc15bc3d83956c63b98eb6865f18411b62')
+_commit=b9196c0b357a903ad0a41cb4acce62cc1b0f2057  # tags/v1.1.38^0
+source=(
+  "git+https://gitlab.gnome.org/GNOME/libxslt.git#commit=$_commit"
+)
+b2sums=('SKIP')
+
 
 pkgver() {
   cd $_basename
-  git describe --tags | sed 's/^v//;s/-/+/g'
+  git describe --tags | sed 's/-rc/rc/;s/^v//;s/[^-]*-g/r&/;s/-/+/g'
 }
 
 prepare() {
   cd $_basename
 
-  sed -e 's|/usr/bin/python -u|/usr/bin/python2 -u|g' \
-      -e 's|/usr/bin/python$|/usr/bin/python2|g' \
-      -i python/tests/*.py
-
   # Make xsltproc output reproducible for packages which use it to generate documentation.
-  patch -Np1 -i $srcdir/0002-Make-generate-id-deterministic.patch
+  # patch -Np1 -i $srcdir/0002-Make-generate-id-deterministic.patch
 
   NOCONFIGURE=1 ./autogen.sh
 }
@@ -48,7 +45,9 @@ build() {
 package() {
   cd $_basename
   make DESTDIR="$pkgdir" install
-  find "$pkgdir" -name '*.a' -print -delete
+  mkdir -p "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib"
+  mv "$pkgdir/${_prefix}/${_target}/sysroot/lib/python"* "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib"
+  rmdir "$pkgdir/${_prefix}/${_target}/sysroot/lib"
 }
 
 strip() {

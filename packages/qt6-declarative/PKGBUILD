@@ -1,0 +1,69 @@
+# Maintainer: Martchus <martchus@gmx.net>
+
+# All my PKGBUILDs are managed at https://github.com/Martchus/PKGBUILDs where
+# you also find the URL of a binary repository.
+
+pkgname=${_target}-qt6-declarative
+_qtver=6.6.0
+pkgver=${_qtver/-/}
+pkgrel=1
+arch=(any)
+url='https://www.qt.io'
+license=(GPL3 LGPL3 FDL custom)
+pkgdesc='Classes for QML and JavaScript languages (mingw-w64)'
+depends=("${_target}-qt6-base")
+makedepends=(
+  "${_target}-cmake" 
+  "${_target}-vulkan-headers" 
+  "${_target}-vulkan-icd-loader" 
+  "qt6-declarative"
+  "qt6-shadertools"
+  'ninja'
+  'python'
+)
+optdepends=('qt6-declarative: development tools')
+conflicts=("${_target}-qt6-quickcontrols2")
+provides=("${_target}-qt6-quickcontrols2")
+replaces=("${_target}-qt6-quickcontrols2")
+options=('!buildflags' 'staticlibs' '!emptydirs')
+groups=(${_target}-qt6)
+_pkgfqn="qtdeclarative-everywhere-src-${_qtver}"
+source=("https://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz"
+        '0001-Exclude-qmltime-when-cross-compiling.patch')
+sha256sums=('1b539bb0a918c8f0307fd07bd4ef0334bf7f8934bbc2eabfc04c433a7d7fa331'
+            '61df9e7f6113f6b756585016318471a5d0ce82da9f4f60ee3fa22c6addfa82b9')
+
+prepare () {
+  cd $_pkgfqn
+
+  # apply patches; further descriptions can be found in patch files itself
+  for patch in "$srcdir/"*.patch; do
+    msg2 "Applying patch $patch"
+    patch -p1 -i "$patch"
+  done
+}
+
+build() {
+  export PKG_CONFIG="${_prefix}/${_target}/${_target}-pkg-config"
+  ${_target}-cmake \
+    -G Ninja \
+    -B build \
+    -S $_pkgfqn \
+    -DFEATURE_pkg_config=ON \
+    -DQT_USE_CCACHE=ON
+
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+
+  # Drop QMAKE_PRL_BUILD_DIR because reference the build dir
+  find "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib" -type f -name '*.prl' \
+    -exec sed -i -e '/^QMAKE_PRL_BUILD_DIR/d' {} \;
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

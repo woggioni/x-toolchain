@@ -5,7 +5,7 @@
 
 pkgname="${_target}-libxml2"
 _basename="${pkgname#${_target}-}"
-pkgver=2.9.8
+pkgver=2.11.5
 pkgrel=1
 pkgdesc="XML parsing library, version 2"
 url="http://www.xmlsoft.org/"
@@ -14,13 +14,14 @@ license=(MIT)
 options=(staticlibs !buildflags)
 depends=("${_target}-zlib" "${_target}-readline" "${_target}-ncurses" "${_target}-xz" "${_target}-icu")
 makedepends=("${_target}-python" git "${_target}-configure")
-_commit=18890f471c420411aa3c989e104d090966ec9dbf  # tags/v2.9.8^0
-source=(git+https://git.gnome.org/browse/libxml2#commit=$_commit
-        libxml2-2.9.8-python3-unicode-errors.patch
-        https://www.w3.org/XML/Test/xmlts20130923.tar.gz)
-sha256sums=('SKIP'
-            '37eb81a8ec6929eed1514e891bff2dd05b450bcf0c712153880c485b7366c17c'
-            '9b61db9f5dbffa545f4b8d78422167083a8568c59bd1129f94138f936cf6fc1f')
+_commit=2b998a4ffbdfea04fc6a620721abc690a15743af  # tags/v2.11.5^0
+source=(
+  "git+https://gitlab.gnome.org/GNOME/libxml2.git#commit=$_commit"
+  https://www.w3.org/XML/Test/xmlts20130923.tar.gz
+)
+b2sums=('SKIP'
+        '63a47bc69278ef510cd0b3779aed729e1b309e30efa0015d28ed051cc03f9dfddb447ab57b07b3393e8f47393d15473b0e199c34cb1f5f746b15ddfaa55670be')
+
 
 pkgver() {
   cd ${_basename}
@@ -28,32 +29,27 @@ pkgver() {
 }
 
 prepare() {
-  mkdir build-py{2,3}
+  mkdir build
   cd ${_basename}  
-  patch -Np1 -i ../libxml2-2.9.8-python3-unicode-errors.patch
   NOCONFIGURE=1 ./autogen.sh
 }
 
-_build() (
-  cd build-py$1
+build() {
+  cd build
   ${_target}-configure \
     --with-threads \
     --with-history \
-    --with-python=${_prefix}/${_target}/sysroot/bin/python$1 \
+    --with-python=${_prefix}/${_target}/sysroot/usr/bin/python3 \
     --with-icu ../${_basename}/
   sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0 /g' libtool
   PYTHONHASHSEED=0 make
   find doc -type f -exec chmod 0644 {} +
-)
-
-build() {
-  # _build 2
-  _build 3
 }
 
 package() {
-  # make -C build-py2 DESTDIR="$pkgdir" install
-  make -C build-py3 DESTDIR="$pkgdir" install
+  make -C build DESTDIR="$pkgdir" install
+  rm -r $pkgdir/${_prefix}/${_target}/sysroot/lib
+  #rm -r $pkgdir/${_prefix}/${_target}/sysroot/usr/share/doc
 }
 
 strip() {

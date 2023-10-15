@@ -3,34 +3,51 @@
 
 pkgname="${_target}-wayland-protocols"
 _basename="${pkgname#${_target}-}"
-pkgver=1.13
+pkgver=1.32
 pkgrel=1
 pkgdesc='Specifications of extended Wayland protocols'
 arch=('any')
 url='https://wayland.freedesktop.org/'
 license=('MIT')
-options=('staticlibs' '!strip' '!buildflags')
-makedepends=('wayland')
+options=('staticlibs' '!buildflags')
+depends=("${_target}-gcc")
+makedepends=('wayland' 'meson' 'ninja' "${_target}-meson")
 validpgpkeys=('8307C0A224BABDA1BABD0EB9A6EEEC9E0136164A'  # Jonas Ådahl
               'A66D805F7C9329B4C5D82767CCC4F07FAC641EFF') # Daniel Stone
-source=("https://wayland.freedesktop.org/releases/$_basename-$pkgver.tar.xz"{,.sig})
-sha1sums=('1b4b3385e168c361b4d350668d92f3a90ceee189'
-          'SKIP')
+source=("https://gitlab.freedesktop.org/wayland/$_basename/-/releases/$pkgver/downloads/$_basename-$pkgver.tar.xz"{,.sig})
+sha256sums=('7459799d340c8296b695ef857c07ddef24c5a09b09ab6a74f7b92640d2b1ba11'
+            'SKIP')
+
+
+prepare() {
+  cd $_basename-$pkgver
+  # apply patch from the source array (should be a pacman feature)
+  local src
+  for src in "${source[@]}"; do
+    src="${src%%::*}"
+    src="${src##*/}"
+    [[ $src = *.patch ]] || continue
+    echo "Applying patch $src..."
+    patch -Np1 < "../$src"
+  done
+}
 
 build() {
-  cd $_basename-$pkgver
-
-  ${_target}-configure .
-  make
+  mkdir build
+  ${_target}-meson build $_basename-$pkgver
+  meson compile -C build
 }
 
 package() {
-  cd $_basename-$pkgver
-
-  make DESTDIR="$pkgdir" install
-  install -d "$pkgdir/${_prefix}/${_target}/sysroot/lib"
-  mv "$pkgdir/${_prefix}/${_target}/sysroot/share/pkgconfig" "$pkgdir/${_prefix}/${_target}/sysroot/lib"
-  install -Dm 644 COPYING "$pkgdir/${_prefix}/${_target}/sysroot/share/licenses/$_basename/COPYING"
+  DESTDIR="$pkgdir" meson install -C build
+  mkdir -p "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib"
+  mv "$pkgdir/${_prefix}/${_target}/sysroot/usr/share/pkgconfig" "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib"
 }
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip
+
 
 # vim:set ts=2 sw=2 et:

@@ -4,7 +4,7 @@
 
 pkgname="${_target}-libgpg-error"
 _basename="${pkgname#${_target}-}"
-pkgver=1.37
+pkgver=1.47
 pkgrel=1
 pkgdesc="Support library for libgcrypt"
 arch=(x86_64)
@@ -15,10 +15,11 @@ depends=("${_target}-gcc" 'sh')
 makedepends=("${_target}-configure")
 source=(https://www.gnupg.org/ftp/gcrypt/libgpg-error/${_basename}-${pkgver}.tar.bz2{,.sig})
 # https://www.gnupg.org/download/integrity_check.html
-sha1sums=('6dff83371e0c03fe9ba468cc23d528a8c247785a'
-          'SKIP')
-validpgpkeys=('D8692123C4065DEA5E0F3AB5249B39D24F25E3B6'  # Werner Koch
-              '031EC2536E580D8EA286A9F22071B08A33BD3F06') # NIIBE Yutaka (GnuPG Release Key) <gniibe@fsij.org>
+sha256sums=('9e3c670966b96ecc746c28c2c419541e3bcb787d1a73930f5e5f5e1bcbbb9bdb'
+            'SKIP')
+validpgpkeys=('6DAA6E64A76D2840571B4902528897B826403ADA') # Werner Koch (dist signing 2020)
+validpgpkeys+=('AC8E115BF73E2D8D47FA9908E98E9B2D19C6C8BD') # Niibe Yutaka (GnuPG Release Key)
+
 build() {
   cd ${_basename}-${pkgver}
 
@@ -32,16 +33,14 @@ build() {
       cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_os}.h
     fi
   fi
-
-  ./configure --build="$CHOST" --host="${_cpu}-${_vendor}-${_os}" --target="${_cpu}-${_vendor}-${_os}" \
-    --prefix=${_prefix}/${_target} --libdir=${_prefix}/${_target}/sysroot/lib --includedir=${_prefix}/${_target}/sysroot/include \
-    --enable-shared --enable-static
+  ${_target}-configure --enable-shared --enable-static .
   make
 }
 
 package() {
   cd ${_basename}-${pkgver}
   make DESTDIR="${pkgdir}/" install
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/share/info/dir"
 }
 
 strip() {

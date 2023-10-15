@@ -33,14 +33,8 @@ replaces=("${_target}-python3")
 prepare() {
   cd Python-${pkgver}
 
-  # https://bugs.python.org/issue34587
-  sed -i -e "s|testCongestion|disabled_&|" Lib/test/test_socket.py
-
   # FS#23997
   sed -i -e "s|^#.* /usr/local/bin/python|#!/usr/bin/python|" Lib/cgi.py
-
-  # Speed up LTO
-  sed -i -e "s|-flto |-flto=4 |g" configure configure.ac
 
   # Ensure that we are using the system copy of various libraries (expat, libffi, and libmpdec),
   # rather than copies shipped in the tarball
@@ -52,6 +46,8 @@ prepare() {
 build() {
   mkdir build
   pushd build
+    # PGO should be done with -O3
+  CFLAGS="${CFLAGS/-O2/-O3} -ffat-lto-objects"
   export PKG_CONFIG_LIBDIR="${_prefix}/${_target}/sysroot/usr/lib/pkgconfig"
   CONFIG_SITE="${srcdir}/config.site" ${_target}-configure \
               --enable-shared \
@@ -68,7 +64,7 @@ build() {
               --with-build-python=/usr/bin/python \
               --without-ensurepip \
               "../Python-${pkgver}"
-    make
+    make EXTRA_CFLAGS="$CFLAGS"
   popd
 }
 
@@ -76,7 +72,11 @@ package() {
   pushd build
   make install DESTDIR="${pkgdir}"
   mv "${pkgdir}/${_prefix}/${_target}/sysroot/lib/python3.11/"* "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/python3.11/"
-  rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
+  rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib/python3.11/"
+  rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
+  mv "${pkgdir}/${_prefix}/${_target}/sysroot/include/python3.11/"* "${pkgdir}/${_prefix}/${_target}/sysroot/usr/include/python3.11/"
+  rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/include/python3.11/"
+  rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/include"
   popd
 }
 
