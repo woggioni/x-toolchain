@@ -20,20 +20,13 @@ validpgpkeys=('8703B6700E7EE06D7A39B8D6EDAE37B02CEB490D'  # Emil Velikov <emil.l
               '57551DE15B968F6341C248F68D8E31AFC32428A6') # Eric Engestrom <eric@engestrom.ch>
 source=(
   https://mesa.freedesktop.org/archive/mesa-${pkgver}.tar.xz{,.sig}
-  "0001-no-werror.patch"
 )
 sha256sums=('64de0616fc2d801f929ab1ac2a4f16b3e2783c4309a724c8a259b20df8bbc1cc'
             'SKIP' 
-            'SKIP'
 )
 
 prepare () {
   cd "${srcdir}"/mesa-${pkgver}
-  # apply patches; further descriptions can be found in patch files itself
-  for patch in "$srcdir/"*.patch; do
-    msg2 "Applying patch $patch"
-    patch -p0 -i "$patch"
-  done
 }
 
 build() {
@@ -60,12 +53,13 @@ build() {
 }
 
 package() {
-  cd "${srcdir}"/mesa-${pkgver}
-    DESTDIR="$pkgdir" meson -C build install
-    rm -r "$pkgdir"/usr/${_arch}/lib
+  DESTDIR="$pkgdir" meson install -C build
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/libGLESv2.so"*
+  rm "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig/glesv2.pc"
 }
 
 strip() {
     ${_target}-strip $@
 }
+
 export -f strip

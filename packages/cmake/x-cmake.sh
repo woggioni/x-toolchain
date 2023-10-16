@@ -3,7 +3,7 @@ gcc_prefix=@PREFIX@/@TRIPLE@/sysroot
 
 export PKG_CONFIG_LIBDIR="${gcc_prefix}/usr/lib/pkgconfig"
 
-PATH=${gcc_prefix}/bin:$PATH cmake \
+PATH=${gcc_prefix}/bin:$PATH exec cmake \
     -DPKG_CONFIG_EXECUTABLE=@PREFIX@/bin/@TRIPLE@-pkg-config \
     -DCMAKE_INSTALL_PREFIX:PATH=${gcc_prefix}/usr \
     -DCMAKE_INSTALL_BINDIR:PATH=bin \

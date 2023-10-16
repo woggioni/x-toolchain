@@ -23,6 +23,20 @@ build() {
   pushd "$srcdir/llvm-$pkgver.src/"
   curl -L https://github.com/llvm/llvm-project/pull/66355.patch | patch -p2
   popd
+  local target_arch
+  if [ $_cpu == 'x86_64' ]
+  then
+    target_arch='X86'
+  elif [ $_cpu == 'aarch64' ]
+  then
+    target_arch='Aarch64'
+  elif [ $_cpu == 'arm' ]
+  then
+    target_arch='ARM'
+  else
+    error "Unknown target architecture: '$_cpu'"
+    false
+  fi
   mkdir build
   ${_target}-cmake -G Ninja \
     -S "$srcdir/llvm-$pkgver.src/" \
@@ -42,11 +56,10 @@ build() {
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_INCLUDE_BENCHMARKS=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_DEFAULT_TARGET_TRIPLE="${_target}" \
-    -DLLVM_TARGET_ARCH="X86" \
+    -DLLVM_TARGET_ARCH="$target_arch" \
     -DLLVM_TABLEGEN=/usr/bin/llvm-tblgen \
-    -DLLVM_INFERRED_HOST_TRIPLE=x86_64-pc-linux-gnu
+    -DLLVM_HOST_TRIPLE=$CHOST
   cmake --build build
 }
 

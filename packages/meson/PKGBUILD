@@ -20,12 +20,19 @@ build() {
       _exe_wrapper="exe_wrapper = '${_dynamic_liner}'"
       _needs_exe_wrapper='true'
     fi
+    local os
+    if [ $_os == 'linux-musl' ]
+    then
+      os='linux'
+    else
+      os=$_os
+    fi
     sed -e "s|@DYNAMIC_LINKER@|${_dynamic_linker}|g"\
       -e "s|@EXE_WRAPPER@|${_exe_wrapper}|g" \
       -e "s|@TRIPLE@|${_target}|g" \
       -e "s|@PREFIX@|${_prefix}|g" \
       -e "s|@CPU@|${_cpu}|g" \
-      -e "s|@OS@|${_os}|g" \
+      -e "s|@OS@|${os}|g" \
       -e "s|@NEEDS_EXE_WRAPPER@|${_needs_exe_wrapper}|g" \
       x-toolchain.meson > toolchain-${_target}.meson
     sed -e "s|@TRIPLE@|${_target}|g" -e "s|@PREFIX@|${_prefix}|g" x-meson.sh > ${_target}-meson

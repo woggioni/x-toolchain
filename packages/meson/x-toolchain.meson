@@ -12,19 +12,28 @@ cmake = '@PREFIX@/bin/@TRIPLE@-cmake'
 [host_machine]
 system = '@OS@'
 cpu_family = '@CPU@'
-cpu = 'sandybridge'
+cpu = '@CPU@'
 endian = 'little'
 
 [target_machine]
 system = '@OS@'
 cpu_family = '@CPU@'
-cpu = 'sandybridge'
+cpu = '@CPU@'
 endian = 'little'
 
 [built-in options]
-c_link_args = ['-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib', '-Wl,-dynamic-linker=@DYNAMIC_LINKER@']
-cpp_link_args = ['-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib', '-Wl,-dynamic-linker=@DYNAMIC_LINKER@']
+c_link_args = [
+    '-Wl,--as-needed', 
+    '-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib',
+    '-Wl,-dynamic-linker=@DYNAMIC_LINKER@'
+]
+cpp_link_args = [
+    -Wl,--as-needed,
+    '-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib',
+    '-Wl,-dynamic-linker=@DYNAMIC_LINKER@'
+]
 
 [properties]
 needs_exe_wrapper = @NEEDS_EXE_WRAPPER@
-
+root = '@TRIPLE@'
+sys_root = '@PREFIX@/@TRIPLE@/sysroot'
