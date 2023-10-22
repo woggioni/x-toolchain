@@ -1,0 +1,36 @@
+# Maintainer: Martchus <martchus@gmx.net>
+
+# All my PKGBUILDs are managed at https://github.com/Martchus/PKGBUILDs where
+# you also find the URL of a binary repository.
+
+pkgname=${_target}-qt6-shadertools
+_qtver=6.6.0
+pkgver=${_qtver/-/}
+pkgrel=1
+arch=('x86_64')
+url='https://www.qt.io'
+license=(GPL3 LGPL3 FDL custom)
+pkgdesc="APIs and tools in this module provide the producer functionality for the shader pipeline that allows Qt Quick to operate on Vulkan, Metal, and Direct3D, in addition to OpenGL (${_target})"
+depends=("${_target}-qt6-base")
+makedepends=("${_target}-cmake" "${_target}-vulkan-headers" "${_target}-vulkan-icd-loader" "qt6-shadertools" 'ninja')
+optdepends=('qt6-shadertools: development tools')
+options=('!strip' '!buildflags' 'staticlibs' '!emptydirs')
+groups=(${_target}-qt6)
+_pkgfqn="qtshadertools-everywhere-src-${_qtver}"
+source=("https://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz")
+sha256sums=('3690327dc550144b8102be2bb7f6dc995ccbe3584041094ad021a83737ef9875')
+
+build() {
+  ${_target}-cmake -G Ninja -B build -S $_pkgfqn \
+    -DFEATURE_pkg_config=ON
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

@@ -1,0 +1,38 @@
+# Maintainer: Martchus <martchus@gmx.net>
+
+# All my PKGBUILDs are managed at https://github.com/Martchus/PKGBUILDs where
+# you also find the URL of a binary repository.
+
+pkgname=${_target}-qt6-quick3d
+_qtver=6.6.0
+pkgver=${_qtver/-/}
+pkgrel=1
+arch=(any)
+url='https://www.qt.io'
+license=(GPL3 LGPL3 FDL custom)
+pkgdesc="Qt module and API for defining 3D content in Qt Quick ${_target}"
+depends=("${_target}-qt6-declarative")
+makedepends=("${_target}-cmake" "${_target}-vulkan-headers" "${_target}-vulkan-icd-loader"
+             "${_target}-qt6-shadertools" "qt6-quick3d" "qt6-shadertools" 'ninja')
+options=('!buildflags' 'staticlibs' '!emptydirs')
+groups=(${_target}-qt6)
+_pkgfqn="qtquick3d-everywhere-src-${_qtver}"
+source=("https://download.qt.io/official_releases/qt/${pkgver%.*}/${_qtver}/submodules/${_pkgfqn}.tar.xz")
+sha256sums=('37ab3eb394e49d6c2b03c4da0c7f782c255dff294e73946369dd2e059a837aba')
+
+build() {
+  export PKG_CONFIG=/usr/bin/$_arch-pkg-config
+  ${_target}-cmake -G Ninja -B build -S $_pkgfqn \
+    -DFEATURE_pkg_config=ON \
+    -DFEATURE_quick3d_assimp=OFF
+  cmake --build build
+}
+
+package() {
+  DESTDIR="$pkgdir" ${_target}-cmake --install build
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

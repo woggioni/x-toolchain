@@ -38,7 +38,8 @@ validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 build() {
   cd "${srcdir}"/${pkgname#${_target}-}-${pkgver}
   _configure_args=(
-    --with-openssl
+    --without-openssl
+    --with-gnutls
     --disable-ldap
     --disable-ldaps
     --disable-manual
@@ -46,6 +47,8 @@ build() {
     --enable-threaded-resolver
     ${_idn_configure_flag}
     --with-libssh2
+    --with-nghttp3
+    --with-ngtcp2
     --enable-versioned-symbols
     --with-gssapi
     --with-ca-bundle="/etc/ssl/certs/ca-certificates.crt"
