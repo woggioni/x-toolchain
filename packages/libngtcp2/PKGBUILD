@@ -18,7 +18,7 @@ makedepends=(ninja)
 prepare() {
   local cmake_options=(
     -DCMAKE_BUILD_TYPE=Release
-    -DENABLE_OPENSSL=OFF
+    -DENABLE_OPENSSL=ON
     -DENABLE_GNUTLS=ON
   )
   ${_target}-cmake -G Ninja ${cmake_options[@]} -S ngtcp2-${pkgver} -B build

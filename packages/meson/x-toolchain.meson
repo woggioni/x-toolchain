@@ -22,16 +22,13 @@ cpu = '@CPU@'
 endian = 'little'
 
 [built-in options]
-c_link_args = [
-    '-Wl,--as-needed', 
+c_link_args = ['-Wl,--as-needed', 
     '-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib',
-    '-Wl,-dynamic-linker=@DYNAMIC_LINKER@'
-]
-cpp_link_args = [
-    -Wl,--as-needed,
+    '-Wl,-dynamic-linker=@DYNAMIC_LINKER@']
+
+cpp_link_args = ['-Wl,--as-needed',
     '-Wl,-rpath=@PREFIX@/@TRIPLE@/sysroot/lib:@PREFIX@/@TRIPLE@/sysroot/usr/lib',
-    '-Wl,-dynamic-linker=@DYNAMIC_LINKER@'
-]
+    '-Wl,-dynamic-linker=@DYNAMIC_LINKER@']
 
 [properties]
 needs_exe_wrapper = @NEEDS_EXE_WRAPPER@

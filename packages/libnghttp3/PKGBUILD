@@ -16,8 +16,6 @@ sha256sums=('838def499e368b24d8a4656ad9a1f38bb7ca8b2857a44c5de1c006420cc0bbee')
 prepare() {
   local cmake_options=(
     -DCMAKE_BUILD_TYPE=Release
-    -DENABLE_OPENSSL=OFF
-    -DENABLE_GNUTLS=ON
   )
   ${_target}-cmake -G Ninja ${cmake_options[@]} -S nghttp3-${pkgver} -B build
 }

@@ -1,0 +1,12 @@
+--- CMakeLists.txt	2023-10-09 14:21:51.000000000 +0800
++++ ../../CMakeLists.txt.backup	2023-10-23 17:55:21.541786515 +0800
+@@ -69,7 +69,8 @@
+ include(CheckCCompilerFlag)
+ 
+ project(CURL C)
+-
++set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
++set(CMAKE_EXE_LINKER_FLAGS "-static")
+ file(STRINGS ${CURL_SOURCE_DIR}/include/curl/curlver.h CURL_VERSION_H_CONTENTS REGEX "#define LIBCURL_VERSION( |_NUM )")
+ string(REGEX MATCH "#define LIBCURL_VERSION \"[^\"]*"
+   CURL_VERSION ${CURL_VERSION_H_CONTENTS})

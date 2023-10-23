@@ -11,45 +11,42 @@ arch=('x86_64')
 url='https://nghttp2.org/'
 license=('MIT')
 options=('staticlibs' '!buildflags')
-depends=("${_target}-gcc")
+depends=("${_target}-gcc" "${_target}-openssl" "${_target}-libnghttp3" "${_target}-libngtcp2" "${_target}-libev" "${_target}-c-ares")
 makedepends=('git' "${_target}-configure")
 conflicts=("${_target}-nghttp2<1.20.0-2")
 validpgpkeys=('F4F3B91474D1EB29889BD0EF7E8403D5D673C366') # Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-source=("git+https://github.com/nghttp2/nghttp2.git#tag=${_tag}?signed")
-sha512sums=('SKIP')
+source=("git+https://github.com/nghttp2/nghttp2.git#tag=${_tag}?signed" '001-libressl.patch')
+sha512sums=(
+  'SKIP'
+  '255725dd7d2accc7ac8dbf47847207a0c901712a3832fa9c97434c292b42db4d54a7f64450aea076fa4373e44c4e1318380b64e0dea7d838773f631d1d64292f'
+)
 
 prepare() {
-  cd nghttp2
+  pushd nghttp2
+    git apply ${srcdir}/001-libressl.patch
+  popd
+  find "nghttp2" -name '*.cc' -type f -exec \
+          sed -i -e "s/NGTCP2_CC_ALGO_BBR_V2/NGTCP2_CC_ALGO_BBR/g" \
+                 -e "s/-lharfbuzz /-lharfbuzz -lfreetype -lharfbuzz -liconv -lbz2 /g" {} \;
+                 
 
-  autoreconf -i
+  local cmake_options=(
+    -DCMAKE_BUILD_TYPE=Release
+    -DENABLE_APP=ON
+    -DENABLE_DOC=OFF
+    -DENABLE_HTTP3=ON
+    -DENABLE_STATIC_LIB=ON
+  )
+  ${_target}-cmake -G Ninja ${cmake_options[@]} -S nghttp2 -B build
 }
 
 build() {
-  cd nghttp2
-
-#   ${_target}-configure \
-#     --disable-examples \
-#     --disable-python-bindings \
-#     --enable-lib-only
-#   make
-  mkdir -p build-${_target}-static && pushd build-${_target}-static
-  ${_target}-configure $configure_args \
-      --disable-examples --disable-python-bindings --enable-lib-only --enable-static --disable-shared ..
-  make
-  popd
-  mkdir -p build-${_target} && pushd build-${_target}
-  ${_target}-configure $configure_args \
-      --disable-examples --disable-python-bindings --enable-lib-only --disable-static --enable-shared ..
-  make
-  popd
+  cmake --build build
 }
 
-
 package() {
-  cd "${srcdir}/nghttp2/build-${_target}-static/lib"
-  make DESTDIR="${pkgdir}" install
-  cd "${srcdir}/nghttp2/build-${_target}/lib"
-  make DESTDIR="${pkgdir}" install
+  DESTDIR="${pkgdir}" cmake --install build
+  rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/share"
 }
 
 strip() {

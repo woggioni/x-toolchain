@@ -1,0 +1,49 @@
+# Maintainer: David Runge <dvzrv@archlinux.org>
+# Contributor: Dave Reisner <dreisner@archlinux.org>
+# Contributor: Daniel J Griffiths <ghost1227@archlinux.us>
+# Contributor: Jeff Mickey <jeff@archlinux.org>
+# Contributor: Alexander Fehr <pizzapunk gmail com>
+
+pkgbase=c-ares
+pkgname=${_target}-${pkgbase}
+pkgver=1.20.1
+pkgrel=1
+pkgdesc="A C library for asynchronous DNS requests"
+arch=(x86_64)
+url="https://c-ares.haxx.se/"
+license=(MIT)
+options=('staticlibs' '!buildflags')
+depends=(${_target}-gcc)
+makedepends=(${_target}-cmake ninja)
+provides=(${_target}-libcares.so)
+source=(https://github.com/$pkgbase/$pkgbase/releases/download/${pkgbase//-}-${pkgver//./_}/$pkgbase-$pkgver.tar.gz{,.asc})
+sha512sums=('83400fb276ebcf16dfe6f43d56ca87839d132b5a0544420eda9fa148eb85468b3f215593fcefc2a7a3a8ed8b0d4ef093ed99616a4e466b01f6913934240539e4'
+            'SKIP')
+b2sums=('44d160e04dcbd78f0ad7c1f2eb3f34ff07017fd9b5c4bc12b81b123022297adccfff45f43630f8c73afdfd9424ff6ee9fb96c627405ec486c8d78bb0c7e518ca'
+        'SKIP')
+validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg <daniel@haxx.se>
+
+build() {
+  local cmake_options=(
+    -G Ninja
+    -B build
+    -D CMAKE_BUILD_TYPE=RELEASE
+    -DCARES_SHARED=ON
+    -DCARES_STATIC=ON
+    -S $pkgbase-$pkgver
+    -W no-dev
+  )
+  ${_target}-cmake "${cmake_options[@]}"
+  cmake --build build --verbose
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  ln -s ${_prefix}/${_target}/sysroot/usr/lib/libcares_static.a "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/libcares.a"
+  rm -r "${pkgdir}"/${_prefix}/${_target}/sysroot/usr/share
+}
+
+strip() {
+    ${_target}-strip $@
+}
+export -f strip

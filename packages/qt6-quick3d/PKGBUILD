@@ -24,12 +24,13 @@ build() {
   export PKG_CONFIG=/usr/bin/$_arch-pkg-config
   ${_target}-cmake -G Ninja -B build -S $_pkgfqn \
     -DFEATURE_pkg_config=ON \
+    -DQT_USE_CCACHE=ON \
     -DFEATURE_quick3d_assimp=OFF
   cmake --build build
 }
 
 package() {
-  DESTDIR="$pkgdir" ${_target}-cmake --install build
+  DESTDIR="$pkgdir" cmake --install build
 }
 
 strip() {

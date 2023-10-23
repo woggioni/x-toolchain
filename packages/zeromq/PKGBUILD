@@ -59,7 +59,7 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  rm -r "$pkgdir/${_prefix}/${_target}/sysroot/"{bin,share}
+  rm -r "$pkgdir/${_prefix}/${_target}/sysroot/usr/share"
 }
 
 strip() {

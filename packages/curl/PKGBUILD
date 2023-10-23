@@ -1,6 +1,6 @@
 # Contributor: ant32 <antreimer@gmail.com>
 
-pkgname="${_target}-curl"
+pkgname=("${_target}-curl" "${_target}-curl-static-exe")
 _basename="${pkgname#${_target}-}"
 pkgver=8.4.0
 pkgrel=1
@@ -23,23 +23,57 @@ else
           "${_target}-libssh2"
           "${_target}-openssl"
           "${_target}-zlib"
-          "${_target}-libnghttp2")
+          "${_target}-libnghttp2"
+          "${_target}-libnghttp3"
+          "${_target}-libngtcp2"
+          "${_target}-c-ares"
+          "${_target}-brotli"
+          "${_target}-zstd"
+          )
   _idn_configure_flag=""
 fi
 
 makedepends=("${_target}-configure")
 options=('staticlibs' '!buildflags')
 provides=("${_target}-libcurl.so")
-source=("https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc})
+source=(
+  "https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc}
+  "001-build-static-exe.patch"
+)
 sha512sums=('375d241effccde852cfba32aa61be406f6c6e8ef2773b48d57bfa1ff99fdf414dc08bdb6b3a65930e53b28e31246a4bc396c81054ae9c560a3bf58cca0ae78b0'
-            'SKIP')
+            'SKIP'
+            'ffe5a0f693150d80ce48e524309d9a6ed1319e0e2160b2ec5a54831991bde1e949497d287f202842712072b5e42201dbe987093ebbbe234bc61423beb013d46c'
+            )
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 
-build() {
-  cd "${srcdir}"/${pkgname#${_target}-}-${pkgver}
+prepare() {
+  local _source="${srcdir}"/${pkgname#${_target}-}-${pkgver}
+
+  pushd $_source
+  patch -p0 -i "${srcdir}/001-build-static-exe.patch"
+  popd
+
+  local _cmake_args=(
+    -DCURL_BROTLI=ON 
+    -DBUILD_STATIC_CURL=ON 
+    -DBUILD_SHARED_LIBS=OFF 
+    -DBUILD_STATIC_LIBS=ON 
+    -DBUILD_TESTING=OFF 
+    -DCURL_ENABLE_SSL=ON 
+    -DCURL_USE_OPENSSL=ON 
+    -DENABLE_ARES=ON 
+    -DUSE_NGHTTP2=ON 
+    -DUSE_NGTCP2=ON 
+    -DUSE_LIBIDN2=ON 
+    -DCURL_ZSTD=ON 
+    -DCURL_ZLIB=ON 
+    -DCURL_LTO=ON
+  )
+  ${_target}-cmake -G Ninja -S $_source -B build-static-exe ${_cmake_args[@]}
+
   _configure_args=(
-    --without-openssl
-    --with-gnutls
+    --with-openssl
+    # --with-gnutls
     --disable-ldap
     --disable-ldaps
     --disable-manual
@@ -54,23 +88,44 @@ build() {
     --with-ca-bundle="/etc/ssl/certs/ca-certificates.crt"
     --without-random
   )
-  mkdir -p build-${_target}-static && pushd build-${_target}-static
-  ${_target}-configure ${_configure_args[@]} --enable-static --disable-shared ..
+  mkdir -p build-static && pushd build-static
+  ${_target}-configure ${_configure_args[@]} --enable-static --disable-shared $_source
+  popd
+  mkdir -p build-shared && pushd build-shared
+  ${_target}-configure ${_configure_args[@]} --disable-static --enable-shared $_source
+  popd
+}
+
+build() {
+
+  local _source="${srcdir}"/${pkgname#${_target}-}-${pkgver}
+  cmake --build build-static-exe
+  pushd build-static
   make
   popd
-  mkdir -p build-${_target} && pushd build-${_target}
-  ${_target}-configure ${_configure_args[@]} --disable-static --enable-shared ..
+  pushd build-shared
   make
   popd
 }
 
-package() {
-    cd "${srcdir}/${pkgname#${_target}-}-${pkgver}/build-${_target}-static"
+package_libs() {
+    cd "${srcdir}/build-static"
     make DESTDIR="${pkgdir}" install
-    cd "${srcdir}/${pkgname#${_target}-}-${pkgver}/build-${_target}"
+    cd "${srcdir}/build-shared"
     make DESTDIR="${pkgdir}" install
     sed -i "s/-lidn2/-lidn2 -lunistring/g" "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig/libcurl.pc"
 }
+
+eval "package_${_target}-curl() { package_libs; }"
+
+package_static_exe() {
+  DESTDIR="${pkgdir}" cmake --install build-static-exe
+  rm -rf "${pkgdir}/${_prefix}/${_target}/sysroot/usr/"{share,lib,include}
+  mv "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-static"
+  mv "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-config" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-config-static"
+}
+
+eval "package_${_target}-curl-static-exe() { package_static_exe; }"
 
 strip() {
     ${_target}-strip $@

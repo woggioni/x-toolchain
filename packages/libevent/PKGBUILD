@@ -1,7 +1,7 @@
 # Maintainer: julienCXX <archlinux@chmodplusx.eu>
 pkgname="${_target}-libevent"
 _basename="${pkgname#${_target}-}"
-pkgver=2.1.12
+pkgver=2.2.1
 pkgrel=1
 pkgdesc="An event notification library (${_target})"
 arch=(any)
@@ -10,9 +10,8 @@ license=("BSD")
 makedepends=(${_target}-configure)
 depends=("${_target}-gcc" "${_target}-openssl")
 options=(!libtool !buildflags staticlibs)
-source=(https://github.com/libevent/libevent/releases/download/release-$pkgver-stable/$_basename-$pkgver-stable.tar.gz{,.asc})
-sha256sums=('92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb'
-            'SKIP')
+source=('git+https://github.com/libevent/libevent#tag=release-2.2.1-alpha')
+sha256sums=('SKIP')
 validpgpkeys=('B35BF85BF19489D04E28C33C21194EBB165733EA'
               '9E3AC83A27974B84D1B3401DB86086848EF8686D')
 
@@ -22,7 +21,11 @@ build() {
       -DCMAKE_INSTALL_PREFIX=${_prefix}/${_target}/sysroot/usr/\
       -DCMAKE_INSTALL_LIBDIR=${_prefix}/${_target}/sysroot/usr/lib\
       -DEVENT__LIBRARY_TYPE=SHARED\
-      -S ${_basename}-${pkgver}-stable -B build
+      -DEVENT__DISABLE_MBEDTLS=ON\
+      -DEVENT__DISABLE_SAMPLES=ON\
+      -DEVENT__DISABLE_TESTS=ON\
+      -DEVENT__DISABLE_REGRESS=ON\
+      -S ${_basename} -B build
   cmake --build build
 }
 

@@ -1,0 +1,32 @@
+diff --git a/src/shrpx_config.cc b/src/shrpx_config.cc
+index 453261c2..e458cf44 100644
+--- a/src/shrpx_config.cc
++++ b/src/shrpx_config.cc
+@@ -4117,7 +4117,7 @@ int parse_config(Config *config, int optid, const StringRef &opt,
+     } else if (util::strieq_l("bbr", optarg)) {
+       config->quic.upstream.congestion_controller = NGTCP2_CC_ALGO_BBR;
+     } else if (util::strieq_l("bbrv2", optarg)) {
+-      config->quic.upstream.congestion_controller = NGTCP2_CC_ALGO_BBR_V2;
++      config->quic.upstream.congestion_controller = NGTCP2_CC_ALGO_BBR;
+     } else {
+       LOG(ERROR) << opt << ": must be one of cubic, bbr, and bbrv2";
+       return -1;
+diff --git a/src/shrpx_quic_connection_handler.cc b/src/shrpx_quic_connection_handler.cc
+index 2cd81632..b5f02eb8 100644
+--- a/src/shrpx_quic_connection_handler.cc
++++ b/src/shrpx_quic_connection_handler.cc
+@@ -399,14 +399,6 @@ ClientHandler *QUICConnectionHandler::handle_new_connection(
+   auto config = get_config();
+   auto &quicconf = config->quic;
+ 
+-  if (quicconf.upstream.early_data) {
+-#if OPENSSL_1_1_1_API && !defined(OPENSSL_IS_BORINGSSL)
+-    SSL_set_quic_early_data_enabled(ssl, 1);
+-#else  // !(OPENSSL_1_1_1_API && !defined(OPENSSL_IS_BORINGSSL))
+-    SSL_set_early_data_enabled(ssl, 1);
+-#endif // !(OPENSSL_1_1_1_API && !defined(OPENSSL_IS_BORINGSSL))
+-  }
+-
+   // Disable TLS session ticket if we don't have working ticket
+   // keys.
+   if (!worker_->get_ticket_keys()) {
