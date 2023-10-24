@@ -1,0 +1,11 @@
+--- CMakeLists.txt.backup	2023-10-24 12:39:14.252427326 +0800
++++ CMakeLists.txt	2023-10-24 12:39:36.646048749 +0800
+@@ -335,7 +335,7 @@
+ add_subdirectory(tests)
+ add_subdirectory(crypto)
+ add_subdirectory(third-party)
+-add_subdirectory(examples)
++#add_subdirectory(examples)
+ 
+ 
+ string(TOUPPER "${CMAKE_BUILD_TYPE}" _build_type)

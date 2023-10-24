@@ -85,7 +85,7 @@ prepare() {
     --with-ngtcp2
     --enable-versioned-symbols
     --with-gssapi
-    --with-ca-bundle="/etc/ssl/certs/ca-certificates.crt"
+    --with-ca-bundle="/etc/ssl/cert.pem"
     --without-random
   )
   mkdir -p build-static && pushd build-static

@@ -10,12 +10,21 @@ arch=('x86_64')
 license=('MIT')
 options=('!buildflags' 'staticlibs' '!emptydirs')
 provides=("${_target}-libngtcp2.so")
-source=("${pkgbase}-${pkgver}.tar.gz::https://github.com/ngtcp2/ngtcp2/archive/refs/tags/v${pkgver}.tar.gz")
-sha256sums=('1283eac66b196578fff64e9159bc876f605d928a16562fb608c601f9717dd600')
+source=(
+  "${pkgbase}-${pkgver}.tar.gz::https://github.com/ngtcp2/ngtcp2/archive/refs/tags/v${pkgver}.tar.gz"
+  '0001-disable-examples.patch'
+)
+sha256sums=(
+  '1283eac66b196578fff64e9159bc876f605d928a16562fb608c601f9717dd600'
+  '02b52fe8cbcb28c25d813245f6d984422ef84d12da7c0d40e04c5f8bf6e2ce66'
+)
 depends=(${_target}-gnutls)
 makedepends=(ninja)
 
 prepare() {
+  pushd ngtcp2-${pkgver}
+  patch -p0 -i $srcdir/0001-disable-examples.patch
+  popd
   local cmake_options=(
     -DCMAKE_BUILD_TYPE=Release
     -DENABLE_OPENSSL=ON
