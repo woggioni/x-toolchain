@@ -3,28 +3,36 @@
 # Contributor: Schala Zeal <schalaalexiazeal@gmail.com>
 
 pkgname="${_target}-xz"
-pkgver=5.4.4
+pkgver=5.6.1
 pkgrel=1
 pkgdesc="Library and command line tools for XZ and LZMA compressed files (mingw-w64)"
 arch=('x86_64')
 url="http://tukaani.org/xz"
 license=("custom" "GPL" "LGPL")
-makedepends=("${_target}-configure")
+makedepends=("${_target}-configure" "po4a" "doxygen")
+provides=("${_target}-liblzma.so")
 depends=("${_target}-gcc")
 options=(staticlibs !buildflags)
-source=("https://tukaani.org/xz/xz-${pkgver}.tar.gz")
-md5sums=('b9c34fed669c3e84aa1fa1246a99943b')
+validpgpkeys=('3690C240CE51B4670D30AD1C38EE757D69184620') # Lasse Collin <lasse.collin@tukaani.org>
+source=("git+https://git.tukaani.org/xz.git#tag=v${pkgver}")
+sha256sums=('e10fa4254d5ff033c78dcbfd2866e79a762b8a719503a7c146758e590de945dc')
+sha512sums=('8f4ee2e5c9b46d0917d8bdf8b172a70d02a6cf2d4d78a2e99ae942e32979b72b407809ffda2885af41e2c9d801c19eab5e4fd73888fbaf042346be957df406fc')
+
+prepare() {
+  cd xz
+  ./autogen.sh
+}
 
 build() {
-    cd "${srcdir}/xz-${pkgver}"
+    cd xz
     mkdir -p build-${_target} && pushd build-${_target}
-    ${_prefix}/bin/${_target}-configure
+    ${_target}-configure ..
     make
     popd
 }
 
 package() {
-    cd "${srcdir}/xz-${pkgver}/build-${_target}"
+    cd "${srcdir}/xz/build-${_target}"
     make DESTDIR="$pkgdir" install
 }
 
