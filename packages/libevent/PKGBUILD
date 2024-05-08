@@ -25,6 +25,7 @@ build() {
       -DEVENT__DISABLE_SAMPLES=ON\
       -DEVENT__DISABLE_TESTS=ON\
       -DEVENT__DISABLE_REGRESS=ON\
+      -DEVENT__LIBRARY_TYPE=BOTH\
       -S ${_basename} -B build
   cmake --build build
 }
