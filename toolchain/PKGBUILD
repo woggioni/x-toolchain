@@ -19,20 +19,13 @@ prepare() {
 package() {
   mkdir -p ${pkgdir}/opt/x-tools
   docker run -ti --rm -v ${pkgdir}/opt/x-tools:/opt/x-tools -v ${srcdir}:/mnt/build -v "${startdir}/ccache":/mnt/ccache debian:x-toolchain /bin/bash -c "cd /mnt/build && ./run.sh"
-  if [[ ${_cpu} = "arm" ]]
-  then 
-      _cpuf="armhf" 
-  else
-      _cpuf="${_cpu}" 
-  fi
-  if [[ ${_os} = *"musl"* ]] 
+  if [[ ${_os} = *"musl"* ]]
   then
     rm -rf "${pkgdir}${_prefix}/${_target}/lib"/*
     mv "${pkgdir}${_prefix}/${_target}/sysroot/lib"/* "${pkgdir}${_prefix}/${_target}/lib"
     rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
     ln -s "${_prefix}/${_target}/lib" "${pkgdir}${_prefix}/${_target}/sysroot/lib"
-    rm "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpuf}.so.1"
-    ln -s "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpuf}.so.1"
-    ln -s "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/bin/${_target}-ldd"
+    ln -sf "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpu}*.so.1"
+    ln -sf "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/bin/${_target}-ldd"
   fi
 }

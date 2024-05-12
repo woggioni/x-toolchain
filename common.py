@@ -47,8 +47,8 @@ def argv_parse():
     parser.add_argument("-s", "--system", help="system name", metavar='SYSTEM')
     parser.add_argument("-t", "--triplet", help="triplet name", metavar='CPU-VENDOR-SYSTEM')
     parser.add_argument("-l", "--list", help="list all available toolchains", action='store_true')
-    parser.add_argument("-i", "--input-build-file", help="path to a dependecy resolution file", metavar='build.pickle')
-    parser.add_argument("-o", "--output-build-file", help="path to a dependecy resolution file", metavar='build.pickle')
+    parser.add_argument("-i", "--input-build-file", help="path to a dependency resolution file", metavar='build.pickle')
+    parser.add_argument("-o", "--output-build-file", help="path to a dependency resolution file", metavar='build.pickle')
     args = parser.parse_args()
 
     if args.input_build_file:
@@ -105,7 +105,7 @@ def argv_parse():
             print(splitext(basename(config))[0])
         sys.exit(0)
     else:
-        sys.stderr.write('You must either specify a whole triplet ar all of cpu, vendor and system\n')
+        sys.stderr.write('You must either specify a whole triplet or all of cpu, vendor and system\n')
         sys.exit(-1)
 
 
