@@ -25,7 +25,7 @@ package() {
     mv "${pkgdir}${_prefix}/${_target}/sysroot/lib"/* "${pkgdir}${_prefix}/${_target}/lib"
     rmdir "${pkgdir}/${_prefix}/${_target}/sysroot/lib"
     ln -s "${_prefix}/${_target}/lib" "${pkgdir}${_prefix}/${_target}/sysroot/lib"
-    ln -sf "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpu}*.so.1"
+    ln -sf "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/${_target}/lib/ld-musl-${_cpu}"*".so.1"
     ln -sf "${_prefix}/${_target}/sysroot/usr/lib/libc.so" "${pkgdir}${_prefix}/bin/${_target}-ldd"
   fi
 }

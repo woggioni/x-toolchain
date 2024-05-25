@@ -4,7 +4,7 @@
 pkgname="${_target}-libnghttp2"
 _basename="${pkgname#${_target}-}"
 _tag='a1d5296e5114eac3801f9c12a5f5a698ff97abdb' # git rev-parse v${pkgver}
-pkgver=1.57.0
+pkgver=1.62.0
 pkgrel=1
 pkgdesc='Framing layer of HTTP/2 is implemented as a reusable C library'
 arch=('x86_64')
@@ -34,19 +34,37 @@ prepare() {
     -DCMAKE_BUILD_TYPE=Release
     -DENABLE_APP=ON
     -DENABLE_DOC=OFF
+    -DENABLE_EXAMPLES=OFF
     -DENABLE_HTTP3=ON
     -DENABLE_STATIC_LIB=ON
   )
   ${_target}-cmake -G Ninja ${cmake_options[@]} -S nghttp2 -B build
+
+  # local cmake_options=(
+  #   -DCMAKE_BUILD_TYPE=Release
+  #   -DENABLE_APP=ON
+  #   -DENABLE_DOC=OFF
+  #   -DENABLE_EXAMPLES=OFF
+  #   -DENABLE_HTTP3=ON
+  #   -DCMAKE_EXE_LINKER_FLAGS="-static"
+  #   -DBUILD_SHARED_LIBS=OFF
+  #   -DENABLE_SHARED_LIB=OFF
+  # )
+  # ${_target}-cmake -G Ninja ${cmake_options[@]} -S nghttp2 -B build-static
+
 }
 
 build() {
   cmake --build build
+  # cmake --build build-static
 }
 
 package() {
   DESTDIR="${pkgdir}" cmake --install build
   rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/share"
+  # cp build-static/src/nghttpx "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/nghttpx-static"
+  # cp build-static/src/nghttp "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/nghttp-static"
+  # cp build-static/src/nghttpd "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/nghttpd-static"
 }
 
 strip() {

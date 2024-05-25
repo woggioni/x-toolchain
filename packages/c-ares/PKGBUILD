@@ -6,7 +6,7 @@
 
 pkgbase=c-ares
 pkgname=${_target}-${pkgbase}
-pkgver=1.20.1
+pkgver=1.28.1
 pkgrel=1
 pkgdesc="A C library for asynchronous DNS requests"
 arch=(x86_64)
@@ -17,9 +17,9 @@ depends=(${_target}-gcc)
 makedepends=(${_target}-cmake ninja)
 provides=(${_target}-libcares.so)
 source=(https://github.com/$pkgbase/$pkgbase/releases/download/${pkgbase//-}-${pkgver//./_}/$pkgbase-$pkgver.tar.gz{,.asc})
-sha512sums=('83400fb276ebcf16dfe6f43d56ca87839d132b5a0544420eda9fa148eb85468b3f215593fcefc2a7a3a8ed8b0d4ef093ed99616a4e466b01f6913934240539e4'
+sha512sums=('9a24f40002b661d97c9b49a617d2e6b12bad1c9f22e872611252d051ec650f886c010207939fac6992610b3cd5a87588f802d7dfa1310ced7c6621ea2f99dd90'
             'SKIP')
-b2sums=('44d160e04dcbd78f0ad7c1f2eb3f34ff07017fd9b5c4bc12b81b123022297adccfff45f43630f8c73afdfd9424ff6ee9fb96c627405ec486c8d78bb0c7e518ca'
+b2sums=('2d0f12aeb4b947f76fe6c45e2bb0a7401c5d3ae5c84a94f2387f05b639587275e12cb0a2798caa381726e37757973b28c543249f9528b60746b8bf543a70be77'
         'SKIP')
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg <daniel@haxx.se>
 

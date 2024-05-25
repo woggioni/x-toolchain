@@ -13,6 +13,7 @@ build() {
     _dynamic_linker=$(echo "${_prefix}/${_target}"/lib/ld-*.so*)  
     sed -e "s|@PREFIX@|${_prefix}|g"\
         -e "s|@DYNAMIC_LINKER@|${_dynamic_linker}|g"\
+        -e "s|@BUILD_TRIPLE@|${CHOST}|g"\
         -e "s|@TRIPLE@|${_target}|g" x-configure.sh > ${_target}-configure
 }
 

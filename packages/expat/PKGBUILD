@@ -1,32 +1,42 @@
 pkgname=${_target}-expat
 _basename="${pkgname#${_target}-}"
-pkgver=2.5.0
+pkgver=2.6.2
 pkgrel=1
 pkgdesc="An XML parser library (${_target})"
 arch=('x86_64')
 url="http://expat.sourceforge.net"
 license=("custom")
-makedepends=("${_target}-configure")
+makedepends=("${_target}-configure" "${_target}-cmake" 'ninja')
 depends=("${_target}-gcc")
 options=(!buildflags staticlibs)
 source=(https://github.com/libexpat/libexpat/releases/download/R_${pkgver//./_}/$_basename-$pkgver.tar.bz2{,.asc})
-sha512sums=('22fd904d75aab7506a85c03519b9cf79e44898c8e1ba6abf6cb7f95de71b8e63a7e2d5cf4395e3627d46035ea29342b3e631a8809fef8aad3f59976dc075ad17'
+sha512sums=('15811413e92a632272188781cc3f2a9e52ed62f6edfad9b2eeeca0946e53132b6c9ca6dc460eda766d6a4e68e5920128335d705f9556b5aa3f77593658780470'
             'SKIP')
-b2sums=('15a5dcd3af17995fb4299301710b38d609c1fe7a8d6a6284581fedd96e89e0c16526d0342fb55773ac9d678cd65dc5cdb1532c764eeb3a20ccdf1e168b96e337'
+b2sums=('9b518cf768e53b177fd933d37686a76c4a1bd1e2829cf414f8f9c054901f61d6445232eb4d4502e888507efa12a48d8ace206fbabac5d2ca5365f0437e971fd8'
         'SKIP')
 validpgpkeys=(3176EF7DB2367F1FCA4F306B1F9B0E909AF37285) # Sebastian Pipping
 
+prepare() {
+    local cmake_options=(
+        -G Ninja
+        -D CMAKE_BUILD_TYPE=Release
+        -D EXPAT_BUILD_EXAMPLES=OFF
+        -D EXPAT_BUILD_TESTS=OFF
+        -S "expat-${pkgver}"
+        -W no-dev
+   )
+   "${_target}-cmake" -DEXPAT_SHARED_LIBS=OFF -B build-static "${cmake_options[@]}" 
+   "${_target}-cmake" -DEXPAT_SHARED_LIBS=ON -B build-shared "${cmake_options[@]}" 
+}
+
 build() {
-  cd "${srcdir}/expat-${pkgver}"
-    mkdir -p build-${_target} && pushd build-${_target}
-    ${_target}-configure ..
-    make
-    popd
+    cmake --build build-static
+    cmake --build build-shared
 }
 
 package() {
-    cd "${srcdir}/expat-${pkgver}/build-${_target}"
-    make DESTDIR="$pkgdir" install
+    DESTDIR="$pkgdir" cmake --install build-shared
+    install -vDm 644 build-static/libexpat.a -t "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/"
 }
 
 strip() {

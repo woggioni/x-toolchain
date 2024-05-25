@@ -2,7 +2,7 @@
 
 pkgbase=libngtcp2
 pkgname=${_target}-libngtcp2
-pkgver=1.4.0
+pkgver=1.5.0
 pkgrel=1
 pkgdesc='Implementation of IETF QUIC protocol'
 url='https://github.com/ngtcp2/ngtcp2'
@@ -15,8 +15,8 @@ source=(
 )
 sha256sums=(
   'SKIP'
-  '7e5aab44375979ad32e1024290418d4f1c89852fe1ddb6994266817bcbb73722'
 )
+
 depends=(${_target}-gnutls)
 makedepends=(ninja)
 

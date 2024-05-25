@@ -2,7 +2,7 @@
 
 pkgname=("${_target}-curl" "${_target}-curl-static-exe")
 _basename="${pkgname#${_target}-}"
-pkgver=8.4.0
+pkgver=8.7.1
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
 arch=('x86_64')
@@ -40,7 +40,7 @@ source=(
   "https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc}
   "001-build-static-exe.patch"
 )
-sha512sums=('375d241effccde852cfba32aa61be406f6c6e8ef2773b48d57bfa1ff99fdf414dc08bdb6b3a65930e53b28e31246a4bc396c81054ae9c560a3bf58cca0ae78b0'
+sha512sums=('66e2c55a6366ad5a4c2649051ad3f645b5f272439051edd168d23a974089550091503da36d99630d60dfbf04cbb0b8aea3e4db0e95de9855d3d53627565deb5b'
             'SKIP'
             'ffe5a0f693150d80ce48e524309d9a6ed1319e0e2160b2ec5a54831991bde1e949497d287f202842712072b5e42201dbe987093ebbbe234bc61423beb013d46c'
             )

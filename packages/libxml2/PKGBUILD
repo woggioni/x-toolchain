@@ -5,7 +5,7 @@
 
 pkgname="${_target}-libxml2"
 _basename="${pkgname#${_target}-}"
-pkgver=2.11.5
+pkgver=2.12.6
 pkgrel=1
 pkgdesc="XML parsing library, version 2"
 url="http://www.xmlsoft.org/"
@@ -14,7 +14,7 @@ license=(MIT)
 options=(staticlibs !buildflags)
 depends=("${_target}-zlib" "${_target}-readline" "${_target}-ncurses" "${_target}-xz" "${_target}-icu")
 makedepends=("${_target}-python" git "${_target}-configure")
-_commit=2b998a4ffbdfea04fc6a620721abc690a15743af  # tags/v2.11.5^0
+_commit=505e2e872e767405be565aa9d47ae9d6d5677f79  # tags/v2.12.6^0
 source=(
   "git+https://gitlab.gnome.org/GNOME/libxml2.git#commit=$_commit"
   https://www.w3.org/XML/Test/xmlts20130923.tar.gz

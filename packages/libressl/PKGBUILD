@@ -7,62 +7,67 @@
 
 pkgbase=libressl
 pkgname=${_target}-${pkgbase}
-pkgver=3.8.1
+pkgver=3.9.2
 pkgrel=1
 pkgdesc="Free version of the TLS/crypto stack forked from OpenSSL"
 arch=(x86_64)
 url="https://www.libressl.org/"
 license=(ISC custom:OpenSSL)
 options=('staticlibs' '!buildflags')
-depends=(${_target}-gcc)
+depends=("${_target}-gcc")
+makedepends=("${_target}-configure" "${_target}-cmake" ninja)
 provides=(${_target}-openssl)
 conflicts=(${_target}-openssl)
 source=(https://cdn.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${pkgver}.tar.gz{,.asc})
-sha256sums=('c29bd6d9522746773cb9e4126d5a9a2c35ea5505f6fd49b679173f2b46e57372'
+sha256sums=('7b031dac64a59eb6ee3304f7ffb75dad33ab8c9d279c847f92c89fb846068f97'
             'SKIP')
 validpgpkeys=(A1EB079B8D3EB92B4EBD3139663AF51BD5E4D8D5) # Brent Cook <bcook@openbsd.org>
 
-# prepare() {
-#   local cmake_options=(
-#     -DCMAKE_BUILD_TYPE=Release
-#     -DENABLE_ASM=ON
-#     -DENABLE_NC=ON
-#     -DLIBRESSL_TESTS=OFF
-#     -DBUILD_STATIC_LIBS=ON
-#   )
-#   ${_target}-cmake -G Ninja ${cmake_options[@]} -S ${pkgbase}-${pkgver} -B build
-# }
-
-# build() {
-#   cmake --build build
-# }
-
-# package() {
-#   DESTDIR="${pkgdir}" cmake --install build
-#   rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/share"
-# }
-
 prepare() {
-    cd ${pkgbase}-${pkgver}
-    autoreconf -vfi
+  local cmake_options=(
+    -DCMAKE_BUILD_TYPE=Release
+    -DENABLE_ASM=ON
+    -DENABLE_NC=ON
+    -DLIBRESSL_TESTS=OFF
+  )
+  ${_target}-cmake -G Ninja ${cmake_options[@]} -DBUILD_SHARED_LIBS=ON -S ${pkgbase}-${pkgver} -B build-shared
+  ${_target}-cmake -G Ninja ${cmake_options[@]} -DBUILD_SHARED_LIBS=OFF -S ${pkgbase}-${pkgver} -B build-static
 }
 
 build() {
-    cd ${pkgbase}-${pkgver}
-    local options=(
-        --disable-tests
-        --enable-nc
-    )
-    ${_target}-configure ${options[@]} .
-    sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
-    make
+  cmake --build build-shared
+  cmake --build build-static
 }
 
 package() {
-    cd ${pkgbase}-${pkgver}
-    make DESTDIR="${pkgdir}" install
-    rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/share"
+  DESTDIR="${pkgdir}" cmake --install build-shared
+  install build-static/ssl/libssl.a "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/"
+  install build-static/tls/libtls.a "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/"
+  install build-static/crypto/libcrypto.a "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/"
+  rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/share"
 }
+
+# prepare() {
+#     cd ${pkgbase}-${pkgver}
+#     autoreconf -vfi
+# }
+
+# build() {
+#     cd ${pkgbase}-${pkgver}
+#     local options=(
+#         --disable-tests
+#         --enable-nc
+#     )
+#     ${_target}-configure ${options[@]} .
+#     sed -i -e 's/ -shared / -Wl,-O1,--as-needed\0/g' libtool
+#     make
+# }
+
+# package() {
+#     cd ${pkgbase}-${pkgver}
+#     make DESTDIR="${pkgdir}" install
+#     rm -r "${pkgdir}/${_prefix}/${_target}/sysroot/usr/share"
+# }
 
 
 
