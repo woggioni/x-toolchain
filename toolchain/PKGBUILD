@@ -1,5 +1,5 @@
 pkgname="${_target}-gcc"
-pkgver="13.2.0"
+pkgver="14.2.0"
 pkgrel=1
 pkgdesc="${_target} gcc cross-toolchain"
 arch=('x86_64')
@@ -13,12 +13,11 @@ prepare() {
   cp ${srcdir}/run.sh run2.sh
   mv run2.sh run.sh
   cp "${_target}.config" .config
-  mkdir -p "${startdir}/ccache"
 }
 
 package() {
   mkdir -p ${pkgdir}/opt/x-tools
-  docker run -ti --rm -v ${pkgdir}/opt/x-tools:/opt/x-tools -v ${srcdir}:/mnt/build -v "${startdir}/ccache":/mnt/ccache debian:x-toolchain /bin/bash -c "cd /mnt/build && ./run.sh"
+  docker run -ti --rm -v ${pkgdir}/opt/x-tools:/opt/x-tools -v ${srcdir}:/mnt/build -v "${HOME}/.cache/ccache/:/mnt/ccache" debian:x-toolchain /bin/bash -c "cd /mnt/build &&./run.sh"
   if [[ ${_os} = *"musl"* ]]
   then
     rm -rf "${pkgdir}${_prefix}/${_target}/lib"/*
