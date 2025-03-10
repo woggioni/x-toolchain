@@ -1,7 +1,7 @@
 pkgname=${_target}-lz4
 _basename="${pkgname#${_target}-}"
 epoch=1
-pkgver=1.9.4
+pkgver=1.10.0
 pkgrel=1
 pkgdesc='Extremely fast compression algorithm'
 arch=('x86_64')
@@ -9,11 +9,9 @@ url='http://www.lz4.org/'
 license=('GPL2')
 makedepends=('git')
 depends=("${_target}-gcc" "${_target}-cmake")
-source=(
-    "git+https://github.com/lz4/lz4.git#tag=v$pkgver"
-)
+source=("git+https://github.com/lz4/lz4.git#tag=v$pkgver")
+sha256sums=('487f9bc24fdaf589e2f4bb23dd98b1f21a71b643db09251145616587c9468555')
 
-sha256sums=('SKIP')
 options=(!buildflags staticlibs)
 
 build() {

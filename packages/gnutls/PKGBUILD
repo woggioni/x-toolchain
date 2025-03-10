@@ -1,6 +1,6 @@
 pkgbase=gnutls
 pkgname=${_target}-gnutls
-pkgver=3.8.5
+pkgver=3.8.7
 pkgrel=1
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
 arch=('x86_64')
@@ -21,10 +21,10 @@ backup=(etc/gnutls/config
         etc/modules-load.d/gnutls.conf)
 source=(https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/${pkgbase}-${pkgver}.tar.xz{,.sig})
 sha256sums=(
-    '66269a2cfe0e1c2dabec87bdbbd8ab656f396edd9a40dd006978e003cfa52bfc'
+    'fe302f2b6ad5a564bcb3678eb61616413ed5277aaf8e7bf7cdb9a95a18d9f477'
     'SKIP'
 )
-validpgpkeys=('5D46CB0F763405A7053556F47A75A648B3F9220C') # "Zoltan Fridrich <zfridric@redhat.com>"
+validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871') # "Zoltan Fridrich <zfridric@redhat.com>"
 
 build() {
   cd ${pkgbase}-${pkgver}

@@ -1,6 +1,6 @@
 pkgname=${_target}-zstd
 _basename="${pkgname#${_target}-}"
-pkgver=1.5.5
+pkgver=1.5.7
 pkgrel=1
 pkgdesc='Zstandard - Fast real-time compression algorithm'
 arch=('x86_64')
@@ -10,11 +10,14 @@ options=(!buildflags staticlibs)
 makedepends=("${_target}-meson")
 depends=("${_target}-gcc" "${_target}-zlib" "${_target}-xz" "${_target}-lz4")
 provides=(${_target}-libzstd.so)
-source=(https://github.com/facebook/zstd/releases/download/v${pkgver}/zstd-${pkgver}.tar.zst{,.sig})
-sha256sums=('ce264bca60eb2f0e99e4508cffd0d4d19dd362e84244d7fc941e79fa69ccf673'
-            'SKIP')
-b2sums=('2c2dc95f227e661ada23d8f6141bcd293505ce14e605f946ae00d4d4ac37d10b4eb08279ef7560618c67caf266431f76686fda5ae1921d698a6a93bbaf9a0052'
-        'SKIP')
+source=(https://github.com/facebook/zstd/releases/download/v${pkgver}/zstd-${pkgver}.tar.zst{,.sig}
+  https://github.com/facebook/zstd/commit/6af3842118ea5325480b403213b2a9fbed3d3d74.patch)
+sha256sums=('5b331d961d6989dc21bb03397fc7a2a4d86bc65a14adc5ffbbce050354e30fd2'
+            'SKIP'
+            '7c07be222d45718b81fb16f97e611adfeb24efa0712ca77fb1e08f4c67803ec3')
+b2sums=('20df0493d9d960b8fc98f7cac7630f84dae6226bd906364ab9c9ce7dfb2be44a303fd077e4264979f3ee92efd59072d63c4bb4ae7b65c52f6ce0153513088837'
+        'SKIP'
+        '02e472b01ead30ebc703f64d35ccbfe1db8a9eae6b15a3690e6e5092c6b8cdfaaca585b31b965d94eea7da04cebd6bcca7f5c8bbf9e2c2e84b4acd7f3ce54e5d')
 validpgpkeys=(4EF4AC63455FC9F4545D9B7DEF8FE99528B52FFD)
 
 
