@@ -3,14 +3,14 @@
 
 _reponame="crosstool-ng"
 pkgname="xng"
-pkgver=5678.cf6b1740
+pkgver=5841.5a11188b
 pkgrel=1
 pkgdesc="Crosstool-NG is a versatile (cross) toolchain generator"
 arch=('any')
 makedepends=('git' 'help2man')
 license=('custom')
 url="http://crosstool-ng.github.io/"
-source=("git+https://github.com/crosstool-ng/crosstool-ng.git#tag=crosstool-ng-1.26.0")
+source=("git+https://github.com/crosstool-ng/crosstool-ng.git#tag=crosstool-ng-1.27.0")
 md5sums=('SKIP')
 pkgver() {
   cd "${_reponame}"

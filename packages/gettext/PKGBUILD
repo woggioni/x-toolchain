@@ -1,46 +1,41 @@
 # Contributor: Filip Brcic <brcha@gna.org>
 # Contributor: Martchus <martchus@gmx.net>
 
-pkgname=${_target}-gettext
-pkgver=0.19.8.1
-pkgrel=3
+_basename=gettext
+pkgname=${_target}-${_basename}
+pkgver=0.24
+pkgrel=1
 arch=('any')
 pkgdesc="GNU internationalization library (${_target})"
 #conflicts=("${_target}-termcap" "${_target}-libunistring")
-depends=("${_target}-libunistring")
+depends=("${_target}-libunistring" "${_target}-xz")
 makedepends=('gettext' "${_target}-configure")
 options=(!buildflags staticlibs)
 license=("GPL")
 url="http://www.gnu.org/software/gettext/"
-source=("http://ftp.gnu.org/pub/gnu/gettext/gettext-${pkgver}.tar.gz"{,.sig}
-        "05-always-use-libintl-vsnprintf.mingw.patch"
-        "06-dont-include-ctype-after-gnulibs-wctype.mingw.patch"
-        "07-fix-asprintf-conflict.mingw.patch"
-        "08-vs-compatible.patch"
-        "09-gnulib-fix-underscore-cond.patch"
-        "intl.pc")
-md5sums=('97e034cf8ce5ba73a28ff6c3c0638092'
-         'SKIP'
-         '27852a388b8cf38188dc392c244230ff'
-         'f69747f43f279b8a81286cfe5916b82f'
-         '3ebccf730ec3377b068027eb2283afb2'
-         'f5b611172ae58f1e4589a8d0c1d53414'
-         'bed0da63d251975a21ca830f2f156766'
-         'b0a123ec7ad1a345d0d712dae986a543')
-validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871') # Daiki Ueno
+source=(
+  https://ftp.gnu.org/pub/gnu/gettext/$_basename-$pkgver.tar.gz{,.sig}
+)
+
+b2sums=('c318b4f39bd2c3e467029df806fe97f084c22d56b5a77b66cfbafdd7b666bd971625669c26aa3e0aa06dcbf4a6823cc12441c05431d83a215027438848d53fc4' 'SKIP')
+validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871'  # Daiki Ueno
+              '68D94D8AAEEAD48AE7DC5B904F494A942E4616C2'
+              '9001B85AF9E1B83DF1BDA942F5BE8B267C6A406D'  # Bruno Haible
+              'E0FFBD975397F77A32AB76ECB6301D9E1BBEAC08') # Bruno Haible (Open Source Development)
+
 
 prepare() {
-  cd gettext-$pkgver
-  # patch -p0 -i ${srcdir}/05-always-use-libintl-vsnprintf.mingw.patch
-  # patch -p0 -i ${srcdir}/06-dont-include-ctype-after-gnulibs-wctype.mingw.patch
-  # patch -p0 -i ${srcdir}/07-fix-asprintf-conflict.mingw.patch
-  # patch -p0 -i ${srcdir}/08-vs-compatible.patch
-  # prevents "Cannot export rpl_printf: symbol not found"
-  # patch -p0 -i ${srcdir}/09-gnulib-fix-underscore-cond.patch
+  cd $_basename-$pkgver
+  automake
+  # Do not build libtextstyle, as it depends on libcroco
+  # which is now unmaintained and has known security bugs.
+  # patch from Fedora	
+  # patch -p1 -i $srcdir/gettext-0.22-disable-libtextstyle.patch
+
 }
 
 build() {
-  cd gettext-${pkgver}
+  cd $_basename-${pkgver}
   unset LDFLAGS
     mkdir -p build-${_target} && pushd build-${_target}
     # define USER_LABEL_PREFIX_UNDERSCORE to prevent undefined reference to `__imp_exit_failure'
@@ -53,6 +48,9 @@ build() {
       --disable-java \
       --disable-native-java \
       --disable-csharp \
+      --with-xz \
+      --without-included-gettext \
+      --without-included-libunistring \
       --without-emacs ..
     make
     popd
@@ -62,13 +60,15 @@ package() {
     cd "${srcdir}/${pkgname#${_target}-}-$pkgver/build-${_target}"
     make DESTDIR="$pkgdir" install
     # provide pkgconfig file for iconv library
-    install -dm755 "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig"
-    install -m644 "$srcdir/intl.pc" "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig"
-    sed -i "$pkgdir/${_prefix}/${_target}/sysroot/lib/pkgconfig/intl.pc" \
-      -e "s|@PREFIX[@]|/${_prefix}/${_target}|g" \
-      -e "s|@VERSION[@]|$pkgver|g"
-    rm "$pkgdir/${_prefix}/${_target}/sysroot/lib/charset.alias"
-    rm "$pkgdir/${_prefix}/${_target}/sysroot/share/info/dir"
+    install -dm755 "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig"
+    #install -m644 "$srcdir/intl.pc" "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig"
+
+    #sed -i "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/pkgconfig/intl.pc" \
+    #  -e "s|@PREFIX[@]|/${_prefix}/${_target}|g" \
+    #  -e "s|@VERSION[@]|$pkgver|g"
+    # rm "$pkgdir/${_prefix}/${_target}/sysroot/lib/charset.alias"
+    rm -r "$pkgdir/${_prefix}/${_target}/sysroot/usr/share"
+    rm -r "$pkgdir/${_prefix}/${_target}/sysroot/usr/lib/gettext"
 }
 
 strip() {

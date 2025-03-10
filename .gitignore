@@ -1,3 +1,6 @@
 packages/*/*.tar.xz
+packages/*/*.pkg.tar.zst
+packages/*/*.tar.*
+packages/*/*.sig
 packages/*/src
 packages/*/pkg

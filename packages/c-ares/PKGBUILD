@@ -6,22 +6,27 @@
 
 pkgbase=c-ares
 pkgname=${_target}-${pkgbase}
-pkgver=1.28.1
+pkgver=1.34.4
 pkgrel=1
 pkgdesc="A C library for asynchronous DNS requests"
 arch=(x86_64)
-url="https://c-ares.haxx.se/"
+url="https://c-ares.org/"
+_url=https://github.com/c-ares/c-ares
 license=(MIT)
 options=('staticlibs' '!buildflags')
 depends=(${_target}-gcc)
 makedepends=(${_target}-cmake ninja)
 provides=(${_target}-libcares.so)
-source=(https://github.com/$pkgbase/$pkgbase/releases/download/${pkgbase//-}-${pkgver//./_}/$pkgbase-$pkgver.tar.gz{,.asc})
-sha512sums=('9a24f40002b661d97c9b49a617d2e6b12bad1c9f22e872611252d051ec650f886c010207939fac6992610b3cd5a87588f802d7dfa1310ced7c6621ea2f99dd90'
-            'SKIP')
-b2sums=('2d0f12aeb4b947f76fe6c45e2bb0a7401c5d3ae5c84a94f2387f05b639587275e12cb0a2798caa381726e37757973b28c543249f9528b60746b8bf543a70be77'
-        'SKIP')
-validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg <daniel@haxx.se>
+source=(
+  git+$_url.git?signed#tag=v$pkgver
+)
+sha512sums=('17a50051b73a6690b616fba45da1151c412c3112808c2636533a0b94b94fa8c34ecc0118d8fadaefa88423b6a66c66530bcd36a575aa2a7ae80b4e80c161d96b')
+b2sums=('3c9f414a842911dca79cb2b550dd12eda073683b91537c2a205311cc0c75c97ed9ea86aa018cdf5909fed7e468d04b6a436700a0a7cbd0bd33c9517c136a3b80')
+validpgpkeys=(
+  27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2  # Daniel Stenberg <daniel@haxx.se>
+  DA7D64E4C82C6294CB73A20E22E3D13B5411B7CA  # Brad House <brad@brad-house.com>
+)
+
 
 build() {
   local cmake_options=(
@@ -30,7 +35,7 @@ build() {
     -D CMAKE_BUILD_TYPE=RELEASE
     -DCARES_SHARED=ON
     -DCARES_STATIC=ON
-    -S $pkgbase-$pkgver
+    -S $pkgbase
     -W no-dev
   )
   ${_target}-cmake "${cmake_options[@]}"
@@ -39,7 +44,7 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  ln -s ${_prefix}/${_target}/sysroot/usr/lib/libcares_static.a "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/libcares.a"
+  #ln -s ${_prefix}/${_target}/sysroot/usr/lib/libcares_static.a "${pkgdir}/${_prefix}/${_target}/sysroot/usr/lib/libcares.a"
   rm -r "${pkgdir}"/${_prefix}/${_target}/sysroot/usr/share
 }
 

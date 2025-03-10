@@ -3,7 +3,7 @@
 # Contributor: Schala Zeal <schalaalexiazeal@gmail.com>
 
 pkgname="${_target}-xz"
-pkgver=5.6.1
+pkgver=5.6.4
 pkgrel=1
 pkgdesc="Library and command line tools for XZ and LZMA compressed files (mingw-w64)"
 arch=('x86_64')
@@ -15,8 +15,8 @@ depends=("${_target}-gcc")
 options=(staticlibs !buildflags)
 validpgpkeys=('3690C240CE51B4670D30AD1C38EE757D69184620') # Lasse Collin <lasse.collin@tukaani.org>
 source=("git+https://git.tukaani.org/xz.git#tag=v${pkgver}")
-sha256sums=('e10fa4254d5ff033c78dcbfd2866e79a762b8a719503a7c146758e590de945dc')
-sha512sums=('8f4ee2e5c9b46d0917d8bdf8b172a70d02a6cf2d4d78a2e99ae942e32979b72b407809ffda2885af41e2c9d801c19eab5e4fd73888fbaf042346be957df406fc')
+sha256sums=('0473bff1378094f9868d6f42effab0962d5c9e26616a6b88af3f72abcd8fce04')
+sha512sums=('e3216eca5fae2c9ce419e698bfbe186903088dad0a579749cb49bcde8f9d4073b98bf1570fe69190a9a41feb2a7c9814498ec9b867527de1c74ff75a1cbdfc17')
 
 prepare() {
   cd xz
