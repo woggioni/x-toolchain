@@ -1,8 +1,9 @@
 # Contributor: ant32 <antreimer@gmail.com>
 
-pkgname=("${_target}-curl" "${_target}-curl-static-exe")
+#pkgname=("${_target}-curl" "${_target}-curl-static-exe")
+pkgname=("${_target}-curl")
 _basename="${pkgname#${_target}-}"
-pkgver=8.7.1
+pkgver=8.12.1
 pkgrel=1
 pkgdesc="An URL retrival utility and library (${_target})"
 arch=('x86_64')
@@ -14,14 +15,17 @@ then
   depends=("${_target}-gcc"
           "${_target}-libidn2"
           "${_target}-libssh2"
-          "${_target}-openssl"
+          "${_target}-gnutls"
           "${_target}-zlib"
-          "${_target}-libnghttp2")
+          "${_target}-libnghttp2"
+          "${_target}-libnghttp3"
+          "${_target}-libngtcp2"
+  )
   _idn_configure_flag="--with-libidn2"
 else
   depends=("${_target}-gcc"
           "${_target}-libssh2"
-          "${_target}-openssl"
+          "${_target}-gnutls"
           "${_target}-zlib"
           "${_target}-libnghttp2"
           "${_target}-libnghttp3"
@@ -40,10 +44,10 @@ source=(
   "https://curl.haxx.se/download/$_basename-$pkgver.tar.gz"{,.asc}
   "001-build-static-exe.patch"
 )
-sha512sums=('66e2c55a6366ad5a4c2649051ad3f645b5f272439051edd168d23a974089550091503da36d99630d60dfbf04cbb0b8aea3e4db0e95de9855d3d53627565deb5b'
+sha512sums=('9fcdcceab8bce43e888db79a38c775ff15790a806d3cc5cc96f396a829c6da2383b258481b5642153da14087943f6ef607af0aa3b75df6f41b95c6cd61d835eb'
             'SKIP'
-            'ffe5a0f693150d80ce48e524309d9a6ed1319e0e2160b2ec5a54831991bde1e949497d287f202842712072b5e42201dbe987093ebbbe234bc61423beb013d46c'
-            )
+            '74c1b207681dd02cde46480a1f864e47ac3a2da9a6f6b83a45e8e0f8c51f15e6775cf27fe2d6860a9dfde2757eccbf25c586332616bebca38dcfab93737e517e')
+
 validpgpkeys=('27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2') # Daniel Stenberg
 
 prepare() {
@@ -58,9 +62,12 @@ prepare() {
     -DBUILD_STATIC_CURL=ON 
     -DBUILD_SHARED_LIBS=OFF 
     -DBUILD_STATIC_LIBS=ON 
+    -DBUILD_LIBCURL_DOCS=OFF 
+    -DBUILD_MISC_DOCS=OFF 
     -DBUILD_TESTING=OFF 
-    -DCURL_ENABLE_SSL=ON 
-    -DCURL_USE_OPENSSL=ON 
+    -DCURL_ENABLE_SSL=ON
+    -DCURL_USE_GNUTLS=ON
+    -DCURL_USE_OPENSSL=OFF
     -DENABLE_ARES=ON 
     -DUSE_NGHTTP2=ON 
     -DUSE_NGTCP2=ON 
@@ -69,11 +76,11 @@ prepare() {
     -DCURL_ZLIB=ON 
     -DCURL_LTO=ON
   )
-  ${_target}-cmake -G Ninja -S $_source -B build-static-exe ${_cmake_args[@]}
+  #${_target}-cmake -G Ninja -S $_source -B build-static-exe ${_cmake_args[@]}
 
   _configure_args=(
-    --with-openssl
-    # --with-gnutls
+    #--with-openssl
+    --with-gnutls
     --disable-ldap
     --disable-ldaps
     --disable-manual
@@ -88,6 +95,7 @@ prepare() {
     --with-ca-bundle="/etc/ssl/cert.pem"
     --without-random
   )
+  #export LIBS="${LIBS} -ltasn1 -lnettle -lgmp"
   mkdir -p build-static && pushd build-static
   ${_target}-configure ${_configure_args[@]} --enable-static --disable-shared $_source
   popd
@@ -99,7 +107,7 @@ prepare() {
 build() {
 
   local _source="${srcdir}"/${pkgname#${_target}-}-${pkgver}
-  cmake --build build-static-exe
+  #cmake --build build-static-exe
   pushd build-static
   make
   popd
@@ -118,14 +126,14 @@ package_libs() {
 
 eval "package_${_target}-curl() { package_libs; }"
 
-package_static_exe() {
-  DESTDIR="${pkgdir}" cmake --install build-static-exe
-  rm -rf "${pkgdir}/${_prefix}/${_target}/sysroot/usr/"{share,lib,include}
-  mv "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-static"
-  mv "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-config" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-config-static"
-}
+#package_static_exe() {
+#  DESTDIR="${pkgdir}" cmake --install build-static-exe
+#  rm -rf "${pkgdir}/${_prefix}/${_target}/sysroot/usr/"{share,lib,include}
+#  mv "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-static"
+#  mv "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-config" "${pkgdir}/${_prefix}/${_target}/sysroot/usr/bin/curl-config-static"
+#}
 
-eval "package_${_target}-curl-static-exe() { package_static_exe; }"
+#eval "package_${_target}-curl-static-exe() { package_static_exe; }"
 
 strip() {
     ${_target}-strip $@

@@ -7,7 +7,7 @@
 
 pkgname=${_target}-libgcrypt
 _basename="${pkgname#${_target}-}"
-pkgver=1.10.2
+pkgver=1.11.0
 pkgrel=1
 pkgdesc="General purpose cryptographic library based on the code from GnuPG"
 arch=(x86_64)
@@ -16,20 +16,22 @@ license=('LGPL')
 options=(staticlibs !buildflags)
 depends=("${_target}-libgpg-error")
 makedepends=("${_target}-configure")
-source=("https://gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-${pkgver}.tar.bz2"{,.sig}
-        "libgcrypt-use-correct-def-file.patch"
-        "Smarter-fig2dev-detection.all.patch")
-sha1sums=('0b9555960d84a09ea14e52360808f2e02e9c12d2'
-          'SKIP'
-          '0f03d59dee4b967dfa80621ef4b1efea61772c16'
-          '3613a5454aeaef8d264011f2bc9f2303248fb933')
-validpgpkeys=('6DAA6E64A76D2840571B4902528897B826403ADA') # Werner Koch
+# https://www.gnupg.org/download/integrity_check.html
+source=(https://gnupg.org/ftp/gcrypt/${_basename}/${_basename}-${pkgver}.tar.bz2{,.sig})
+sha256sums=('09120c9867ce7f2081d6aaa1775386b98c2f2f246135761aae47d81f58685b9c'
+            'SKIP')
+validpgpkeys=('6DAA6E64A76D2840571B4902528897B826403ADA') # Niibe Yutaka (GnuPG Release Key)
 
 prepare() {
   cd ${_basename}-${pkgver}
-  patch -p1 -i "$srcdir"/libgcrypt-use-correct-def-file.patch
-  patch -p1 -i "${srcdir}"/Smarter-fig2dev-detection.all.patch
-  autoreconf -fi 
+  # tests fail due to systemd+libseccomp preventing memory syscalls when building in chroots
+  #  t-secmem: line 176: gcry_control (GCRYCTL_INIT_SECMEM, pool_size, 0) failed: General error
+  #  FAIL: t-secmem
+  #  t-sexp: line 1174: gcry_control (GCRYCTL_INIT_SECMEM, 16384, 0) failed: General error
+  #  FAIL: t-sexp
+  sed -i "s:t-secmem::" tests/Makefile.am
+  sed -i "s:t-sexp::" tests/Makefile.am
+  autoreconf -vfi
 }
 
 build() {

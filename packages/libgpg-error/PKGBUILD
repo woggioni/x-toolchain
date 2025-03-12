@@ -4,7 +4,7 @@
 
 pkgname="${_target}-libgpg-error"
 _basename="${pkgname#${_target}-}"
-pkgver=1.47
+pkgver=1.51
 pkgrel=1
 pkgdesc="Support library for libgcrypt"
 arch=(x86_64)
@@ -15,8 +15,9 @@ depends=("${_target}-gcc" 'sh')
 makedepends=("${_target}-configure")
 source=(https://www.gnupg.org/ftp/gcrypt/libgpg-error/${_basename}-${pkgver}.tar.bz2{,.sig})
 # https://www.gnupg.org/download/integrity_check.html
-sha256sums=('9e3c670966b96ecc746c28c2c419541e3bcb787d1a73930f5e5f5e1bcbbb9bdb'
+sha256sums=('be0f1b2db6b93eed55369cdf79f19f72750c8c7c39fc20b577e724545427e6b2'
             'SKIP')
+
 validpgpkeys=('6DAA6E64A76D2840571B4902528897B826403ADA') # Werner Koch (dist signing 2020)
 validpgpkeys+=('AC8E115BF73E2D8D47FA9908E98E9B2D19C6C8BD') # Niibe Yutaka (GnuPG Release Key)
 
@@ -27,10 +28,16 @@ build() {
   then
     if [[ $_cpu == x86_64 ]] && [[ ${_os} == "linux-musl" ]]
     then
-      cp src/syscfg/lock-obj-pub.x86_64-unknown-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
+      if [[ $_vendor != "unknown" ]]
+      then
+          cp src/syscfg/lock-obj-pub.x86_64-unknown-linux-musl.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
+      fi
     elif [[ $_cpu == arm ]] && [[ ${_os} == linux-musl* ]]
     then
-      cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_os}.h
+      if [[ $_vendor != "unknown" ]]
+      then
+        cp src/syscfg/lock-obj-pub.arm-unknown-linux-gnueabi.h src/syscfg/lock-obj-pub.${_cpu}-${_vendor}-${_os}.h
+      fi
     fi
   fi
   ${_target}-configure --enable-shared --enable-static .

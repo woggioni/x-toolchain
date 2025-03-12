@@ -2,7 +2,7 @@
 
 pkgbase=libngtcp2
 pkgname=${_target}-libngtcp2
-pkgver=1.5.0
+pkgver=1.11.0
 pkgrel=1
 pkgdesc='Implementation of IETF QUIC protocol'
 url='https://github.com/ngtcp2/ngtcp2'
@@ -29,8 +29,9 @@ prepare() {
   popd
   local cmake_options=(
     -DCMAKE_BUILD_TYPE=Release
-    -DENABLE_OPENSSL=ON
+    -DENABLE_OPENSSL=OFF
     -DENABLE_GNUTLS=ON
+    -DENABLE_STATIC_LIB=ON
   )
   ${_target}-cmake -G Ninja ${cmake_options[@]} -S ngtcp2 -B build
   local cmake_options=(
@@ -39,13 +40,13 @@ prepare() {
     -DENABLE_GNUTLS=ON
     -DBUILD_SHARED_LIBS=OFF
     -DENABLE_SHARED_LIB=OFF
+    -DENABLE_STATIC_LIB=ON
   )
-  ${_target}-cmake -G Ninja ${cmake_options[@]} -S ngtcp2 -B build-static
 }
 
 build() {
   cmake --build build
-  cmake --build build-static
+  # cmake --build build-static
 }
 
 package() {

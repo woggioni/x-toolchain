@@ -1,6 +1,6 @@
 pkgbase=gnutls
 pkgname=${_target}-gnutls
-pkgver=3.8.7
+pkgver=3.8.9
 pkgrel=1
 pkgdesc="A library which provides a secure layer over a reliable transport layer"
 arch=('x86_64')
@@ -20,10 +20,8 @@ depends=("${_target}-gcc"
 backup=(etc/gnutls/config
         etc/modules-load.d/gnutls.conf)
 source=(https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/${pkgbase}-${pkgver}.tar.xz{,.sig})
-sha256sums=(
-    'fe302f2b6ad5a564bcb3678eb61616413ed5277aaf8e7bf7cdb9a95a18d9f477'
-    'SKIP'
-)
+sha256sums=('69e113d802d1670c4d5ac1b99040b1f2d5c7c05daec5003813c049b5184820ed'
+            'SKIP')
 validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871') # "Zoltan Fridrich <zfridric@redhat.com>"
 
 build() {
@@ -32,18 +30,20 @@ build() {
   --enable-static \
   --enable-shared \
   --disable-tools \
+  --disable-tests \
   --disable-doc \
   --disable-nls \
   --disable-srp-authentication \
-	--with-idn \
-	--with-brotli \
-	--with-zstd \
-	--enable-openssl-compatibility \
+  --with-idn \
+  --with-brotli \
+  --with-zstd \
+  --with-zlib \
+  --enable-openssl-compatibility \
   --disable-rpath \
   --disable-gtk-doc \
   --disable-full-test-suite \
   --without-p11-kit \
-	--disable-ktls \
+  --disable-ktls \
   --without-tpm \
   --enable-year2038 \
   --without-tpm2 \

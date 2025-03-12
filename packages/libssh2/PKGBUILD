@@ -1,8 +1,8 @@
 pkgname="${_target}-libssh2"
-pkgver=1.11.0
+pkgver=1.11.1
 pkgrel=1
 pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts (${_target})"
-arch=(any)
+arch=(x86_64)
 url="http://www.libssh2.org"
 license=("BSD")
 makedepends=("${_target}-configure")
@@ -11,8 +11,9 @@ options=(!libtool staticlibs !buildflags)
 source=("$url/download/${pkgname#${_target}-}-$pkgver.tar.gz"
         "config.sub"
 )
-md5sums=('a01d543fd891ca48fe47726540d50b17' 
-         'SKIP')
+md5sums=('38857d10b5c5deb198d6989dacace2e6'
+         'f32edfea91a86edcbb7da9fb63e9149b')
+
 
 prepare() {
     cp "${srcdir}/config.sub" "${srcdir}/libssh2-${pkgver}"

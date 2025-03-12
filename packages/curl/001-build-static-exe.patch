@@ -1,12 +1,12 @@
---- CMakeLists.txt	2023-10-09 14:21:51.000000000 +0800
-+++ ../../CMakeLists.txt.backup	2023-10-23 17:55:21.541786515 +0800
-@@ -69,7 +69,8 @@
- include(CheckCCompilerFlag)
+--- CMakeLists.txt	2025-02-13 15:15:00.000000000 +0800
++++ CMakeLists.txt	2025-03-12 15:33:37.083264520 +0800
+@@ -86,6 +86,9 @@
+   VERSION "${_curl_version_sem}"
+   LANGUAGES C)
  
- project(CURL C)
--
 +set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
 +set(CMAKE_EXE_LINKER_FLAGS "-static")
- file(STRINGS ${CURL_SOURCE_DIR}/include/curl/curlver.h CURL_VERSION_H_CONTENTS REGEX "#define LIBCURL_VERSION( |_NUM )")
- string(REGEX MATCH "#define LIBCURL_VERSION \"[^\"]*"
-   CURL_VERSION ${CURL_VERSION_H_CONTENTS})
++
+ # CMake does not recognize some targets accurately. Touch up configuration manually as a workaround.
+ if(WINDOWS_STORE AND MINGW)  # mingw UWP build
+   # CMake (as of v3.31.2) gets confused and applies the MSVC rc.exe command-line

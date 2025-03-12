@@ -4,7 +4,8 @@
 
 pkgname="${_target}-json-c"
 _basename="${pkgname#${_target}-}"
-pkgver=0.17
+pkgver=0.18
+_tagdate=20240915
 pkgrel=1
 pkgdesc="A JSON implementation in C"
 url="https://github.com/json-c/json-c/wiki"
@@ -15,15 +16,9 @@ options=('staticlibs' '!buildflags')
 makedepends=(git "${_target}-cmake")
 provides=("${_target}-libjson-c.so")
 _commit=b4c371fa0cbc4dcbaccc359ce9e957a22988fb34  # tags/json-c-0.17-20230812^0
-source=("git+https://github.com/json-c/json-c#commit=$_commit")
-sha256sums=('SKIP')
+source=("git+https://github.com/json-c/json-c#tag=json-c-$pkgver-$_tagdate")
+b2sums=('4abc79ff71b8320022f4385221ff0c7183e2f150c94e3d837369226d26c118a2123823cb5c5123299b87068e998bca543ee20a74b9d6fbe39eb0cbd8600a8473')
 
-pkgver() {
-  cd json-c
-  local tag="$(git describe --tags --abbrev=0)"
-  local ver="$(git describe --tags)"
-  echo "${tag%-*}${ver#$tag}" | sed 's/^json-c-//;s/-/+/g'
-}
 
 build() {
   CFLAGS+=" $CPPFLAGS"
